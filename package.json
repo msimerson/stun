@@ -1,6 +1,6 @@
 {
   "name": "stun",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Session Traversal Utilities for NAT (STUN) client and server.",
   "main": "src/index.js",
   "scripts": {
@@ -46,7 +46,7 @@
     "universalify": "^0.1.2"
   },
   "engines": {
-    "node": ">=8.3"
+    "node": ">=10.24"
   },
   "jest": {
     "modulePaths": [
