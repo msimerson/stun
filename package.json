@@ -1,6 +1,6 @@
 {
   "name": "stun",
-  "version": "2.1.17",
+  "version": "2.1.18",
   "description": "Session Traversal Utilities for NAT (STUN) client and server.",
   "main": "src/index.js",
   "scripts": {
