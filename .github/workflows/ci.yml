@@ -46,7 +46,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ${{ fromJson(needs.get-lts.outputs.active) }}
+        node-version:
+          - 10
+          - ${{ fromJson(needs.get-lts.outputs.active) }}
       fail-fast: false
     steps:
     - uses: actions/checkout@v3
