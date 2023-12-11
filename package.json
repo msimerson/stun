@@ -5,9 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "npx eslint .",
-    "cover": "npx jest --coverage --forceExit",
     "test": "npm run lint && npx jest",
-    "test-ci": "npm run lint && npm run cover"
+    "test-ci": "npx jest",
+    "versions": "npx dependency-version-checker check"
   },
   "bin": "./src/cli.js",
   "repository": {
@@ -30,7 +30,7 @@
   "homepage": "https://github.com/nodertc/stun#readme",
   "devDependencies": {
     "@nodertc/eslint-config": "^0.3.0",
-    "eslint": "^5.16.0",
+    "eslint": "^7.0.0",
     "jest": "^23.6.0",
     "prettier": "^1.17.1"
   },

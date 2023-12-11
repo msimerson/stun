@@ -47,7 +47,7 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - 10
+          - 8
           - ${{ fromJson(needs.get-lts.outputs.active) }}
       fail-fast: false
     steps:
@@ -57,7 +57,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install
-    - run: npm test
+    - run: npm run test-ci
 
   # windows:
   #   needs: [ lint, get-lts ]
@@ -73,7 +73,7 @@ jobs:
   #     with:
   #       node-version: ${{ matrix.node-version }}
   #   - run: npm install
-  #   - run: npm run test
+  #   - run: npm run test-ci
 
   get-lts:
      runs-on: ubuntu-latest
