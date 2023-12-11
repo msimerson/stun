@@ -13,7 +13,7 @@
   "bin": "./src/cli.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nodertc/stun.git"
+    "url": "git+https://github.com/msimerson/stun.git"
   },
   "keywords": [
     "webrtc",
@@ -26,9 +26,9 @@
   "author": "Dmitry Tsvettsikh <me@reklatsmasters.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nodertc/stun/issues"
+    "url": "https://github.com/msimerson/stun/issues"
   },
-  "homepage": "https://github.com/nodertc/stun#readme",
+  "homepage": "https://github.com/msimerson/stun#readme",
   "devDependencies": {
     "@nodertc/eslint-config": "^0.3.0",
     "eslint": "^8.54.0",
