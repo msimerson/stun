@@ -1,19 +1,19 @@
 {
   "name": "stun",
-  "version": "2.1.16",
+  "version": "3.0.0",
   "description": "Session Traversal Utilities for NAT (STUN) client and server.",
   "main": "src/index.js",
   "scripts": {
     "lint": "npx eslint .",
-    "lint-fix": "npx eslint . --fix",
-    "cover": "npx jest --coverage",
+    "lint-fix": "npx eslint --fix .",
     "test": "npm run lint && npx jest",
-    "test-ci": "npm run lint && npm run cover"
+    "test-ci": "npx jest",
+    "versions": "npx dependency-version-checker check"
   },
   "bin": "./src/cli.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nodertc/stun.git"
+    "url": "git+https://github.com/msimerson/stun.git"
   },
   "keywords": [
     "webrtc",
@@ -26,21 +26,21 @@
   "author": "Dmitry Tsvettsikh <me@reklatsmasters.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nodertc/stun/issues"
+    "url": "https://github.com/msimerson/stun/issues"
   },
-  "homepage": "https://github.com/nodertc/stun#readme",
+  "homepage": "https://github.com/msimerson/stun#readme",
   "devDependencies": {
     "@nodertc/eslint-config": "^0.3.0",
-    "eslint": "^8.54.0",
-    "eslint-plugin-prettier": "^5.0.0",
+    "eslint": "^8.55.0",
+    "eslint-plugin-prettier": "^5.0.1",
     "jest": "^29.7.0",
-    "prettier": "^3.1.0"
+    "prettier": "^3.1.1"
   },
   "dependencies": {
     "binary-data": "^0.6.0",
     "buffer-xor": "^2.0.2",
     "debug": "^4.3.4",
-    "ip": "^1.1.8",
+    "ip": "^2.0.0",
     "ip2buf": "^2.0.0",
     "is-stun": "^2.0.0",
     "minimist": "^1.2.8",
@@ -48,7 +48,7 @@
     "universalify": "^2.0.1"
   },
   "engines": {
-    "node": ">=10.0"
+    "node": ">=18.0"
   },
   "jest": {
     "modulePaths": [
