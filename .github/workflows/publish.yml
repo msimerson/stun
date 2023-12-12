@@ -32,6 +32,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           registry-url: https://registry.npmjs.org/
+          scope: "@msimerson"
+      - name: rename package with @msimerson scope
+        run: node .npm/prepend-scope.cjs @msimerson
       - name: publish to NPM
         run: npm publish --access=public
         env:
