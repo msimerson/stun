@@ -3,7 +3,7 @@
 All notable changes to the "stun" package will be documented in this file.
 
 
-### [4.0.0] - 2023-12-13
+### [3.0.0] - 2023-12-13
 
 - BREAKING: drop support for node.js <= 16
     - still works, but no legacy version testing
