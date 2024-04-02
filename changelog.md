@@ -2,6 +2,17 @@
 
 All notable changes to the "stun" package will be documented in this file.
 
+### [3.0.1] - 2024-04-02
+
+- dep(ip): bump 2.0.0 to 2.0.1
+- configure eslint & prettier the modern way
+  - jettison `@nodertc/eslint-config`, much of local config was turning off stuff imported from there
+- ci: bump GHA versions
+- test: remove eslint from devDependencies (installed by GHA for tests, npx will use local version)
+- test: remove jest from devDependencies
+  - installed by npx when needed
+  - dramatically shrinks package-lock.json
+  - next version: replaced with node:test
 
 ### [3.0.0] - 2023-12-13
 

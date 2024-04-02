@@ -1,0 +1,18 @@
+env:
+  node: true
+  es6: true
+  jest: true
+
+extends:
+  - eslint:recommended
+
+ignorePatterns:
+  - coverage
+  - /node_modules
+  - test
+
+rules:
+  no-plusplus: off
+  no-bitwise: off
+  consistent-return: off
+  jsdoc/require-returns: off
