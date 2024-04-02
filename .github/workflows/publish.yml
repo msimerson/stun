@@ -21,7 +21,7 @@ jobs:
       - run: npm test
 
   publish-npm:
-    needs: [ build ]
+    needs: [build]
     runs-on: ubuntu-latest
     environment: npm
     steps:
@@ -32,7 +32,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           registry-url: https://registry.npmjs.org/
-          scope: "@msimerson"
+          scope: '@msimerson'
       - name: rename package with @msimerson scope
         run: node .npm/prepend-scope.cjs @msimerson
       - name: publish to NPM
@@ -41,7 +41,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
   publish-gpr:
-    needs: [ build ]
+    needs: [build]
     runs-on: ubuntu-latest
     environment: ghpm
     permissions:
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           registry-url: https://npm.pkg.github.com/
-          scope: "@msimerson"
+          scope: '@msimerson'
       - name: rename package with @msimerson scope
         run: node .npm/prepend-scope.cjs @msimerson
       - run: npm publish
