@@ -7,7 +7,7 @@
     "lint": "npx eslint .",
     "lint-fix": "npx eslint --fix .",
     "prettier": "npx prettier --check .",
-    "prettier:fix": "npx prettier --fix .",
+    "prettier:fix": "npx prettier --write .",
     "test": "npx jest",
     "versions": "npx dependency-version-checker check"
   },
@@ -30,8 +30,7 @@
     "url": "https://github.com/msimerson/stun/issues"
   },
   "homepage": "https://github.com/msimerson/stun#readme",
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
     "binary-data": "^0.6.0",
     "buffer-xor": "^2.0.2",

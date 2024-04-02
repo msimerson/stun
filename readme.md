@@ -23,21 +23,21 @@ npm i stun
 ## Usage
 
 ```js
-const stun = require("stun");
+const stun = require('stun');
 
-stun.request("stun.l.google.com:19302", (err, res) => {
+stun.request('stun.l.google.com:19302', (err, res) => {
   if (err) {
     console.error(err);
   } else {
     const { address } = res.getXorAddress();
-    console.log("your ip", address);
+    console.log('your ip', address);
   }
 });
 
 // or with promise
 
-const res = await stun.request("stun.l.google.com:19302");
-console.log("your ip", res.getXorAddress().address);
+const res = await stun.request('stun.l.google.com:19302');
+console.log('your ip', res.getXorAddress().address);
 ```
 
 ## CLI
@@ -161,7 +161,7 @@ Check a `FINGERPRINT` attribute if it is specified.
 Check a `MESSAGE_INTEGRITY` attribute if it is specified.
 
 ```js
-stunServer.on("bindingResponse", (msg) => {
+stunServer.on('bindingResponse', (msg) => {
   if (!stun.validateFingerprint(msg)) {
     // do stuff..
   }
@@ -206,7 +206,7 @@ Decode the Buffer into a `StunResponse`.
 ```js
 const socket = dgram.createSocket({ type: 'udp4' });
 
-socket.on("message", (message) => {
+socket.on('message', (message) => {
   const response = stun.decode(message);
   // do stuff ...
 });
@@ -284,7 +284,7 @@ Adds a `type` attribute to the current message. The `type` argument should be on
 - `STUN_ATTR_XOR_RELAYED_ADDRESS`.
 
 ```js
-stunMsg.addAttribute(STUN_ATTR_XOR_MAPPED_ADDRESS, "8.8.8.8", 19302);
+stunMsg.addAttribute(STUN_ATTR_XOR_MAPPED_ADDRESS, '8.8.8.8', 19302);
 ```
 
 <a name="class-stun-message-add-attribute-string" />
@@ -308,7 +308,7 @@ Adds a `type` attribute to the current message. The `type` argument should be on
 - `STUN_ATTR_PADDING`.
 
 ```js
-stunMsg.addAttribute(STUN_ATTR_SOFTWARE, "node/8.2.0 stun/1.0.0");
+stunMsg.addAttribute(STUN_ATTR_SOFTWARE, 'node/8.2.0 stun/1.0.0');
 ```
 
 <a name="class-stun-message-add-attribute-number" />
@@ -348,11 +348,7 @@ stunMsg.addAttribute(STUN_ATTR_UNKNOWN_ATTRIBUTES, [2, 3, 4]);
 Adds a `type` attribute to the current message. The `type` argument should be `STUN_ATTR_ERROR_CODE`.
 
 ```js
-stunMsg.addAttribute(
-  STUN_ATTR_ERROR_CODE,
-  STUN_CODE_UNAUTHORIZED,
-  STUN_REASON_UNAUTHORIZED
-);
+stunMsg.addAttribute(STUN_ATTR_ERROR_CODE, STUN_CODE_UNAUTHORIZED, STUN_REASON_UNAUTHORIZED);
 ```
 
 <a name="class-stun-message-add-address" />

@@ -17,24 +17,21 @@ All notable changes to the "stun" package will be documented in this file.
 ### [3.0.0] - 2023-12-13
 
 - BREAKING: drop support for node.js <= 16
-    - still works, but no legacy version testing
+  - still works, but no legacy version testing
 - dep(eslint): bump to 8.55.0
 - dep(jest): bump to 29.7.0
 - dep(prettier): bump to 3.1.1
-
 
 ## [2.1.16] - 2023-12-09
 
 - dep(meow): replace with minimist
 - dep(parse-url): replace with native URL
-    - require node.js >= 10
+  - require node.js >= 10
 - ci: replace Travis with GHA
-
 
 ## [2.1.0] - 2019-11-23
 
 - `stun.request` supports promise interface.
-
 
 ## [2.0.0] - 2019-06-02
 
