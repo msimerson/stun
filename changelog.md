@@ -2,6 +2,10 @@
 
 All notable changes to the "stun" package will be documented in this file.
 
+### [3.0.2] - 2024-11-13
+
+- dep: replace ip dependency with ipaddr.js
+
 ### [3.0.1] - 2024-04-02
 
 - dep(ip): bump 2.0.0 to 2.0.1
@@ -11,7 +15,7 @@ All notable changes to the "stun" package will be documented in this file.
 - test: remove eslint from devDependencies (installed by GHA for tests, npx will use local version)
 - test: remove jest from devDependencies
   - installed by npx when needed
-  - dramatically shrinks package-lock.json
+  - shrinks package-lock.json from 229KB to 5.7KB
   - next version: replaced with node:test
 
 ### [3.0.0] - 2023-12-13

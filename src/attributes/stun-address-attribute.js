@@ -7,7 +7,7 @@ const {
   decode,
   types: { uint8, uint16be, buffer, reserved },
 } = require('binary-data');
-const ip = require('ip');
+const ipa = require('ipaddr.js');
 const { pton4, pton6 } = require('ip2buf');
 const constants = require('../lib/constants');
 const StunAttribute = require('./stun-attribute');
@@ -59,7 +59,7 @@ module.exports = class StunAddressAttribute extends StunAttribute {
   static from(type, message) {
     const { address, port } = StunAddressAttribute.decode(message);
 
-    const ipaddr = ip.toString(address);
+    const ipaddr = ipa.fromByteArray(address).toString();
 
     assert(isPort(port));
     assert(net.isIP(ipaddr));

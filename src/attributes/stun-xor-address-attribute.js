@@ -1,7 +1,7 @@
 'use strict';
 
 const net = require('net');
-const ip = require('ip');
+const ipa = require('ipaddr.js');
 const xor = require('buffer-xor');
 const { pton4, pton6 } = require('ip2buf');
 const constants = require('../lib/constants');
@@ -36,7 +36,7 @@ module.exports = class StunXorAddressAttribute extends StunAddressAttribute {
     const packet = StunAddressAttribute.decode(message);
 
     const port = xorPort(packet.port);
-    const address = xorIP(ip.toString(packet.address), owner);
+    const address = xorIP(ipa.fromByteArray(packet.address).toString(), owner);
 
     const attribute = new StunXorAddressAttribute(type, address, port);
 
@@ -104,7 +104,7 @@ function xorIP(address, owner) {
     throw new Error(`Invalid ip address: ${address}`);
   }
 
-  return ip.toString(xored);
+  return ipa.fromByteArray(xored).toString();
 }
 
 /**

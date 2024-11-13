@@ -1,6 +1,6 @@
 {
   "name": "stun",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Session Traversal Utilities for NAT (STUN) client and server.",
   "main": "src/index.js",
   "scripts": {
@@ -34,8 +34,8 @@
   "dependencies": {
     "binary-data": "^0.6.0",
     "buffer-xor": "^2.0.2",
-    "debug": "^4.3.4",
-    "ip": "^2.0.1",
+    "debug": "^4.3.7",
+    "ipaddr.js": "^2.2.0",
     "ip2buf": "^2.0.0",
     "is-stun": "^2.0.0",
     "minimist": "^1.2.8",
