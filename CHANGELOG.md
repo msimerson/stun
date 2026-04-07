@@ -2,6 +2,10 @@
 
 All notable changes to the "stun" package will be documented in this file.
 
+### NEXT
+
+- dep(jest): use node:test for test runner
+
 ### [3.0.2] - 2024-11-13
 
 - dep: replace ip dependency with ipaddr.js
