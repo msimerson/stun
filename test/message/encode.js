@@ -1,13 +1,13 @@
 'use strict';
 
-const { describe, test } = require('node:test')
+const { test } = require('node:test')
 const assert = require('node:assert/strict')
 
-const encode = require('message/encode');
-const { messageType, attributeType } = require('lib/constants');
-const StunRequest = require('message/request');
-const StunResponse = require('message/response');
-const attributes = require('lib/attributes');
+const encode = require('../../src/message/encode');
+const { messageType, attributeType } = require('../../src/lib/constants');
+const StunRequest = require('../../src/message/request');
+const StunResponse = require('../../src/message/response');
+const attributes = require('../../src/lib/attributes');
 
 test('should encode request', () => {
   const message = new StunRequest();
@@ -23,7 +23,7 @@ test('should encode request', () => {
     0x36 /* Port */, 0xe1, 0xba, 0xa5, 0x61 /* Ip */,
   ]);
 
-  expect(encode(message)).toEqual(expectedBuffer);
+  assert.deepEqual(encode(message), expectedBuffer);
 });
 
 test('should encode response', () => {
@@ -48,5 +48,5 @@ test('should encode response', () => {
     0x36 /* Port */, 0xe1, 0xba, 0xa5, 0x61 /* Ip */,
   ]);
 
-  expect(encode(message)).toEqual(expectedBuffer);
+  assert.deepEqual(encode(message), expectedBuffer);
 });

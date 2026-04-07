@@ -1,7 +1,10 @@
 'use strict';
 
-const constants = require('lib/constants');
-const StunUInt32Attribute = require('attributes/stun-uint32-attribute');
+const { test } = require('node:test')
+const assert = require('node:assert/strict')
+
+const constants = require('../../src/lib/constants');
+const StunUInt32Attribute = require('../../src/attributes/stun-uint32-attribute');
 
 const type = constants.attributeType.FINGERPRINT;
 
@@ -11,7 +14,7 @@ test('encode', () => {
   const expectedBuffer = Buffer.alloc(4);
   expectedBuffer.writeUInt32BE(0x23456701);
 
-  expect(attribute.toBuffer()).toEqual(expectedBuffer);
+  assert.deepEqual(attribute.toBuffer(), expectedBuffer);
 });
 
 test('decode', () => {
@@ -21,5 +24,5 @@ test('decode', () => {
 
   const attribute = StunUInt32Attribute.from(type, message);
 
-  expect(attribute.value).toBe(expectedNumber);
+  assert.equal(attribute.value, expectedNumber);
 });

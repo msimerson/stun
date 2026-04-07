@@ -1,7 +1,10 @@
 'use strict';
 
-const StunUInt16ListAttribute = require('attributes/stun-uint16list-attribute');
-const constants = require('lib/constants');
+const { test } = require('node:test')
+const assert = require('node:assert/strict')
+
+const StunUInt16ListAttribute = require('../../src/attributes/stun-uint16list-attribute');
+const constants = require('../../src/lib/constants');
 
 const type = constants.attributeType.UNKNOWN_ATTRIBUTES;
 
@@ -14,7 +17,7 @@ test('encode', () => {
 
   const expectedBuffer = Buffer.from([0, 0x1, 0, 0x2, 0, 0x3]);
 
-  expect(attribute.toBuffer()).toEqual(expectedBuffer);
+  assert.deepEqual(attribute.toBuffer(), expectedBuffer);
 });
 
 test('decode', () => {
@@ -22,7 +25,7 @@ test('decode', () => {
 
   const attribute = StunUInt16ListAttribute.from(type, packet);
 
-  expect(attribute.value).toEqual([1, 2, 3]);
+  assert.deepEqual(attribute.value, [1, 2, 3]);
 });
 
 test('encode # constructor', () => {
@@ -30,5 +33,5 @@ test('encode # constructor', () => {
 
   const expectedBuffer = Buffer.from([0, 0x1, 0, 0x2, 0, 0x3]);
 
-  expect(attribute.toBuffer()).toEqual(expectedBuffer);
+  assert.deepEqual(attribute.toBuffer(), expectedBuffer);
 });

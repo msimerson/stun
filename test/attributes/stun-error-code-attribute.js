@@ -1,7 +1,10 @@
 'use strict';
 
-const StunErrorCodeAttribute = require('attributes/stun-error-code-attribute');
-const constants = require('lib/constants');
+const { test } = require('node:test')
+const assert = require('node:assert/strict')
+
+const StunErrorCodeAttribute = require('../../src/attributes/stun-error-code-attribute');
+const constants = require('../../src/lib/constants');
 
 const type = constants.attributeType.ERROR_CODE;
 const code = constants.errorCode.TRY_ALTERNATE;
@@ -14,14 +17,14 @@ test('encode', () => {
 
   const expectedBuffer = Buffer.concat([header, Buffer.from(reason)]);
 
-  expect(attribute.errorClass).toBe(3);
-  expect(attribute.code).toBe(code);
-  expect(attribute.reason).toBe(reason);
-  expect(attribute.value).toEqual({
+  assert.equal(attribute.errorClass, 3);
+  assert.equal(attribute.code, code);
+  assert.equal(attribute.reason, reason);
+  assert.deepEqual(attribute.value, {
     code,
     reason,
   });
-  expect(attribute.toBuffer()).toEqual(expectedBuffer);
+  assert.deepEqual(attribute.toBuffer(), expectedBuffer);
 });
 
 test('decode', () => {
@@ -30,10 +33,10 @@ test('decode', () => {
   const message = Buffer.concat([header, Buffer.from(reason)]);
   const attribute = StunErrorCodeAttribute.from(type, message);
 
-  expect(attribute.errorClass).toBe(3);
-  expect(attribute.code).toBe(code);
-  expect(attribute.reason).toBe(reason);
-  expect(attribute.value).toEqual({
+  assert.equal(attribute.errorClass, 3);
+  assert.equal(attribute.code, code);
+  assert.equal(attribute.reason, reason);
+  assert.deepEqual(attribute.value, {
     code,
     reason,
   });

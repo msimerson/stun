@@ -1,10 +1,19 @@
 'use strict';
 
+const { test } = require('node:test')
+const assert = require('node:assert/strict')
+
 const Emitter = require('events');
-const Server = require('net/dgram-server');
-const { StunMessageError, StunResponseError } = require('lib/errors');
-const { messageType } = require('lib/constants');
-const { createMessage } = require('lib/create-message');
+const Server = require('../../src/net/dgram-server');
+const { StunMessageError, StunResponseError } = require('../../src/lib/errors');
+const { messageType } = require('../../src/lib/constants');
+const { createMessage } = require('../../src/lib/create-message');
+
+function mockFn() {
+  const fn = function(...args) { fn.calls.push(args); };
+  fn.calls = [];
+  return fn;
+}
 
 /**
  * Create fake udp socket.
@@ -21,16 +30,18 @@ test('do not throw exception on invalid message', () => {
   const server = new Server(socket());
   const message = Buffer.from([2, 0xff]);
 
-  server.emit = jest.fn();
+  server.emit = mockFn();
 
   server.process(message, {});
 
-  expect(server.emit).lastCalledWith('error', new StunMessageError(message, {}));
+  const lastCall = server.emit.calls[server.emit.calls.length - 1];
+  assert.equal(lastCall[0], 'error');
+  assert.deepEqual(lastCall[1], new StunMessageError(message, {}));
 });
 
 test('emit StunResponseError for an error messages', () => {
   const server = new Server(socket());
-  server.emit = jest.fn();
+  server.emit = mockFn();
 
   const message = createMessage();
 
@@ -39,49 +50,53 @@ test('emit StunResponseError for an error messages', () => {
 
   server.process(message.toBuffer(), {});
 
-  expect(server.emit).lastCalledWith('error', new StunResponseError(message, {}));
+  const lastCall = server.emit.calls[server.emit.calls.length - 1];
+  assert.equal(lastCall[0], 'error');
+  assert.equal(lastCall[1] instanceof StunResponseError, true);
+  assert.equal(lastCall[1].message, 'hello world');
+  assert.equal(lastCall[1].code, 300);
 });
 
 test('should listen', () => {
   const sock = socket();
-  sock.bind = jest.fn();
+  sock.bind = mockFn();
 
   const server = new Server(sock);
-  server.once = jest.fn();
+  server.once = mockFn();
 
   server.listen(123);
-  expect(sock.bind).toBeCalledWith(123, undefined);
+  assert.deepEqual(sock.bind.calls[sock.bind.calls.length - 1], [123, undefined]);
 
   server.listen(123, 'localhost');
-  expect(sock.bind).toBeCalledWith(123, 'localhost');
+  assert.deepEqual(sock.bind.calls[sock.bind.calls.length - 1], [123, 'localhost']);
 
-  const callback = jest.fn();
+  const callback = mockFn();
   server.listen(123, 'localhost', callback);
-  expect(sock.bind).toBeCalledWith(123, 'localhost');
-  expect(server.once).lastCalledWith('listening', callback);
+  assert.deepEqual(sock.bind.calls[sock.bind.calls.length - 1], [123, 'localhost']);
+  assert.deepEqual(server.once.calls[server.once.calls.length - 1], ['listening', callback]);
 });
 
 test('should call callbacks for `listening`', () => {
   const sock = socket();
-  sock.bind = jest.fn();
+  sock.bind = mockFn();
 
   const server = new Server(sock);
 
-  const callback = jest.fn();
+  const callback = mockFn();
   server.listen(123, 'localhost', callback);
 
   server.emit('listening');
-  expect(callback).toBeCalledTimes(1);
+  assert.equal(callback.calls.length, 1);
 });
 
 test('should emit `listening` event', () => {
   const sock = new Emitter();
   const server = new Server(sock);
-  server.emit = jest.fn();
+  server.emit = mockFn();
 
   sock.emit('listening');
-  expect(server.emit).toBeCalledWith('listening');
+  assert.deepEqual(server.emit.calls[0], ['listening']);
 
   sock.emit('listening');
-  expect(server.emit).toBeCalledTimes(1);
+  assert.equal(server.emit.calls.length, 1);
 });

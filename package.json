@@ -8,7 +8,7 @@
     "lint-fix": "npx eslint --fix .",
     "prettier": "npx prettier --check .",
     "prettier:fix": "npx prettier --write .",
-    "test": "npx jest",
+    "test": "node --test test/index.js test/lib/*.js test/attributes/*.js test/message/*.js test/net/*.js",
     "versions": "npx dependency-version-checker check"
   },
   "bin": "./src/cli.js",
@@ -44,27 +44,5 @@
   },
   "engines": {
     "node": ">=18.0"
-  },
-  "jest": {
-    "modulePaths": [
-      "<rootDir>",
-      "<rootDir>/src"
-    ],
-    "testMatch": [
-      "**/test/**/*.js"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/node_modules/"
-    ],
-    "coverageDirectory": "<rootDir>/coverage",
-    "collectCoverageFrom": [
-      "**/src/*.js",
-      "!**/src/cli.js",
-      "**/src/**/*.js"
-    ],
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/node_modules/"
-    ],
-    "cacheDirectory": ".jest-cache"
   }
 }

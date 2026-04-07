@@ -1,9 +1,12 @@
 'use strict';
 
-const { validateFingerprint, validateMessageIntegrity } = require('lib/validate');
-const constants = require('lib/constants');
-const decode = require('message/decode');
-const { createMessage } = require('lib/create-message');
+const { test } = require('node:test')
+const assert = require('node:assert/strict')
+
+const { validateFingerprint, validateMessageIntegrity } = require('../../src/lib/validate');
+const constants = require('../../src/lib/constants');
+const decode = require('../../src/message/decode');
+const { createMessage } = require('../../src/lib/create-message');
 
 const { SOFTWARE } = constants.attributeType;
 const { BINDING_RESPONSE } = constants.messageType;
@@ -18,7 +21,7 @@ test('validate fingerprint', () => {
 
   const message = decode(packet);
 
-  expect(validateFingerprint(message)).toBe(true);
+  assert.equal(validateFingerprint(message), true);
 });
 
 test('`validateFingerprint` should support uint32 value', () => {
@@ -28,7 +31,7 @@ test('`validateFingerprint` should support uint32 value', () => {
   message.addAttribute(SOFTWARE, '123456789');
   message.addFingerprint();
 
-  expect(validateFingerprint(message)).toBe(true);
+  assert.equal(validateFingerprint(message), true);
 });
 
 test('validate MESSAGE INTEGRITY', () => {
@@ -42,7 +45,7 @@ test('validate MESSAGE INTEGRITY', () => {
   const message = decode(packet);
   const password = '6Gzr+PH5Krjg0VqBa81nE7n6';
 
-  expect(validateMessageIntegrity(message, password)).toBe(true);
+  assert.equal(validateMessageIntegrity(message, password), true);
 });
 
 test('validate MESSAGE INTEGRITY + FINGERPRINT', () => {
@@ -54,6 +57,6 @@ test('validate MESSAGE INTEGRITY + FINGERPRINT', () => {
   message.addMessageIntegrity(password);
   message.addFingerprint();
 
-  expect(validateMessageIntegrity(message, password)).toBe(true);
-  expect(validateFingerprint(message)).toBe(true);
+  assert.equal(validateMessageIntegrity(message, password), true);
+  assert.equal(validateFingerprint(message), true);
 });
