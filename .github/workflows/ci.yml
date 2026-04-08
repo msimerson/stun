@@ -1,7 +1,8 @@
 name: CI
 
 on:
-  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 env:
   CI: true
@@ -9,23 +10,24 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/setup-node@v4
-      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v6
       - run: npm install
-      - run: npm install eslint@^8
+      - run: npm install eslint@^10
       - run: npm run lint
 
   coverage:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/setup-node@v4
-      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v6
       - run: npm install
-      - name: run coverage
-        run: |
-          npm install --no-save c8
-          npx c8 --reporter=lcov npm test
+      - run: npm run test:coverage
         env:
           NODE_ENV: cov
 
@@ -39,14 +41,16 @@ jobs:
 
   ubuntu:
     needs: [lint, get-lts]
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: ${{ fromJson(needs.get-lts.outputs.active) }}
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         name: Node ${{ matrix.node-version }} on ubuntu-latest
         with:
           node-version: ${{ matrix.node-version }}
@@ -55,14 +59,16 @@ jobs:
 
   windows:
     needs: [lint, get-lts]
+    permissions:
+      contents: read
     runs-on: windows-latest
     strategy:
       matrix:
         node-version: ${{ fromJson(needs.get-lts.outputs.active) }}
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         name: Node.js ${{ matrix.node-version }} on windows-latest
         with:
           node-version: ${{ matrix.node-version }}
@@ -70,6 +76,8 @@ jobs:
       - run: npm run test
 
   get-lts:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - id: get
