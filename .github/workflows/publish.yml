@@ -34,7 +34,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
           scope: '@msimerson'
       - name: rename package with @msimerson scope
-        run: node .npm/prepend-scope.cjs @msimerson
+        run: node .release/npm/prepend-scope.cjs @msimerson
       - name: publish to NPM
         run: npm publish --access=public
         env:
@@ -56,7 +56,7 @@ jobs:
           registry-url: https://npm.pkg.github.com/
           scope: '@msimerson'
       - name: rename package with @msimerson scope
-        run: node .npm/prepend-scope.cjs @msimerson
+        run: node .release/npm/prepend-scope.cjs @msimerson
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
