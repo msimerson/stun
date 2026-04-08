@@ -1,6 +1,6 @@
 {
   "name": "@msimerson/stun",
-  "version": "3.1.2",
+  "version": "3.2.0",
   "description": "Session Traversal Utilities for NAT (STUN) client and server.",
   "main": "src/index.js",
   "scripts": {
@@ -14,7 +14,9 @@
     "format": "npm run prettier:fix && npm run lint:fix",
     "versions:fix": "npx npm-dep-mgr update"
   },
-  "bin": "./src/cli.js",
+  "bin": {
+    "stun": "src/cli.js"
+  },
   "files": [
     "src",
     "examples",
