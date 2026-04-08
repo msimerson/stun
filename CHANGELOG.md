@@ -1,6 +1,15 @@
+# Changelog
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/).
+
 # Change Log
 
 All notable changes to the "stun" package will be documented in this file.
+
+### Unreleased
+
+### [3.1.1] - 2026-04-07
+- codeql tidying (#12)
 
 ### [3.1.0] - 2026-04-07
 
@@ -58,3 +67,4 @@ All notable changes to the "stun" package will be documented in this file.
 - Another incompatible API changes.
 
 [3.1.0]: https://github.com/msimerson/stun/releases/tag/3.1.0
+[3.1.1]: https://github.com/msimerson/stun/releases/tag/v3.1.1
