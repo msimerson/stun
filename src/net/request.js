@@ -1,7 +1,9 @@
 'use strict';
 
-const debug = require('debug')('stun:request');
-const { fromCallback } = require('universalify');
+const { promisify } = require('util');
+const debug = process.env.DEBUG?.includes('stun')
+  ? (...args) => console.error('[stun:request]', ...args)
+  : () => {};
 const StunServer = require('../net/dgram-server');
 const StunRequest = require('../message/request');
 const { messageType, eventNames } = require('../lib/constants');
@@ -9,7 +11,7 @@ const { createServer } = require('../net/create-server');
 const { createMessage } = require('../lib/create-message');
 
 module.exports = {
-  request: fromCallback(request),
+  request: promisify(request),
 };
 
 /**

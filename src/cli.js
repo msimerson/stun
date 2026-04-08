@@ -3,15 +3,15 @@
 'use strict';
 
 const dgram = require('dgram');
-const minimist = require('minimist');
 const stun = require('.');
 const { version } = require('../package');
 
-const options = minimist(process.argv.slice(2), {
-  string: ['port'],
-  boolean: ['help'],
-  alias: { port: ['p'], help: ['h'] },
-});
+const argv = process.argv.slice(2);
+const options = { port: undefined, help: false };
+for (let i = 0; i < argv.length; i++) {
+  if (argv[i] === '--port' || argv[i] === '-p') options.port = argv[++i];
+  else if (argv[i] === '--help' || argv[i] === '-h') options.help = true;
+}
 
 if (options.help) {
   process.stdout.write(`

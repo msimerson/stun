@@ -2,7 +2,11 @@
 
 const net = require('net');
 const ipa = require('ipaddr.js');
-const xor = require('buffer-xor');
+function xor(a, b) {
+  const buf = Buffer.allocUnsafe(Math.max(a.length, b.length));
+  for (let i = 0; i < buf.length; i++) buf[i] = a[i] ^ b[i];
+  return buf;
+}
 const { pton4, pton6 } = require('ip2buf');
 const constants = require('../lib/constants');
 const StunAddressAttribute = require('./stun-address-attribute');
