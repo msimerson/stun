@@ -1,15 +1,15 @@
-'use strict';
+'use strict'
 
 const {
   encode,
   decode,
   types: { uint8, string, reserved },
-} = require('binary-data');
-const constants = require('../lib/constants');
-const StunAttribute = require('./stun-attribute');
+} = require('binary-data')
+const constants = require('../lib/constants')
+const StunAttribute = require('./stun-attribute')
 
-const kErrorCode = Symbol('kErrorCode');
-const kErrorReason = Symbol('kErrorReason');
+const kErrorCode = Symbol('kErrorCode')
+const kErrorReason = Symbol('kErrorReason')
 
 /**
  * This class implements STUN attribute for errors.
@@ -22,17 +22,17 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
    * @param {string} reason
    */
   constructor(type, code, reason) {
-    super(type);
+    super(type)
 
-    this[kErrorCode] = 0;
-    this[kErrorReason] = '';
+    this[kErrorCode] = 0
+    this[kErrorReason] = ''
 
     if (Number.isInteger(code)) {
-      this[kErrorCode] = code;
+      this[kErrorCode] = code
     }
 
     if (typeof reason === 'string' && reason.length < 128) {
-      this[kErrorReason] = reason;
+      this[kErrorReason] = reason
     }
   }
 
@@ -48,11 +48,11 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
       errorClass: uint8,
       code: uint8,
       reason: string(message.length - 4),
-    };
+    }
 
-    const { errorClass, code, reason } = decode(message, schema);
+    const { errorClass, code, reason } = decode(message, schema)
 
-    return new StunErrorCodeAttribute(type, errorClass * (code + 100), reason);
+    return new StunErrorCodeAttribute(type, errorClass * (code + 100), reason)
   }
 
   /**
@@ -62,7 +62,7 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
     return {
       code: this.code,
       reason: this.reason,
-    };
+    }
   }
 
   /**
@@ -70,7 +70,7 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
    * @returns {number}
    */
   get code() {
-    return this[kErrorCode];
+    return this[kErrorCode]
   }
 
   /**
@@ -78,7 +78,7 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
    * @returns {string}
    */
   get reason() {
-    return this[kErrorReason];
+    return this[kErrorReason]
   }
 
   /**
@@ -86,7 +86,7 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
    * @returns {number}
    */
   get errorClass() {
-    return parseInt(this.code / 1e2, 10);
+    return parseInt(this.code / 1e2, 10)
   }
 
   /**
@@ -94,7 +94,7 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
    * @returns {number}
    */
   get valueType() {
-    return constants.attributeValueType.ERROR_CODE;
+    return constants.attributeValueType.ERROR_CODE
   }
 
   /**
@@ -108,15 +108,15 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
       errorClass: uint8,
       code: uint8,
       reason: string(Buffer.byteLength(this.reason), 'utf8'),
-    };
+    }
 
     const packet = {
       errorClass: this.errorClass,
       code: this.code % 100,
       reason: this.reason,
-    };
+    }
 
-    encode(packet, encodeStream, schema);
-    return true;
+    encode(packet, encodeStream, schema)
+    return true
   }
-};
+}

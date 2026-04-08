@@ -1,9 +1,9 @@
-'use strict';
+'use strict'
 
-const { attributeType } = require('./constants');
+const { attributeType } = require('./constants')
 
-const kPacket = Symbol('packet');
-const kSender = Symbol('sender');
+const kPacket = Symbol('packet')
+const kSender = Symbol('sender')
 
 /**
  * Base class for STUN errors.
@@ -16,11 +16,11 @@ class StunError extends Error {
    * @param {Object} sender
    */
   constructor(message, packet, sender) {
-    super(message);
+    super(message)
 
-    this.name = 'StunError';
-    this[kPacket] = packet;
-    this[kSender] = sender;
+    this.name = 'StunError'
+    this[kPacket] = packet
+    this[kSender] = sender
   }
 
   /**
@@ -28,7 +28,7 @@ class StunError extends Error {
    * @returns {Buffer|StunMessage|undefined}
    */
   get packet() {
-    return this[kPacket];
+    return this[kPacket]
   }
 
   /**
@@ -36,7 +36,7 @@ class StunError extends Error {
    * @returns {Object|undefined}
    */
   get sender() {
-    return this[kSender];
+    return this[kSender]
   }
 }
 
@@ -50,9 +50,9 @@ class StunMessageError extends StunError {
    * @param {Object} sender
    */
   constructor(packet, sender) {
-    super('Invalid message', packet, sender);
+    super('Invalid message', packet, sender)
 
-    this.name = 'StunMessageError';
+    this.name = 'StunMessageError'
   }
 }
 
@@ -66,15 +66,15 @@ class StunResponseError extends StunError {
    * @param {Object} sender
    */
   constructor(packet, sender) {
-    const error = packet.getAttribute(attributeType.ERROR_CODE);
-    const message = error !== undefined ? error.reason : 'Unknown error';
+    const error = packet.getAttribute(attributeType.ERROR_CODE)
+    const message = error !== undefined ? error.reason : 'Unknown error'
 
-    super(message, packet, sender);
+    super(message, packet, sender)
 
-    this.name = 'StunResponseError';
+    this.name = 'StunResponseError'
 
     if (error !== undefined) {
-      this.code = error.code;
+      this.code = error.code
     }
   }
 }
@@ -83,4 +83,4 @@ module.exports = {
   StunError,
   StunMessageError,
   StunResponseError,
-};
+}

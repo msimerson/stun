@@ -1,17 +1,17 @@
-'use strict';
+'use strict'
 
-const crypto = require('crypto');
-const crc32 = require('turbo-crc32/crc32');
+const crypto = require('crypto')
+const crc32 = require('turbo-crc32/crc32')
 const {
   createEncodeStream,
   encode,
   encodingLength,
   types: { array },
-} = require('binary-data');
-const StunMessage = require('./message');
-const constants = require('../lib/constants');
-const attributes = require('../lib/attributes');
-const { StunMessagePacket, StunAttributePacket } = require('../lib/protocol');
+} = require('binary-data')
+const StunMessage = require('./message')
+const constants = require('../lib/constants')
+const attributes = require('../lib/attributes')
+const { StunMessagePacket, StunAttributePacket } = require('../lib/protocol')
 
 const {
   attributeType,
@@ -22,19 +22,19 @@ const {
   kStunTransactionIdLength,
   kStunMessageIntegritySize,
   kStunLegacyTransactionIdLength,
-} = constants;
+} = constants
 
-const kMessageType = Symbol.for('kMessageType');
-const kTransactionId = Symbol.for('kTransctionId');
-const kCookie = Symbol.for('kCookie');
-const kAttributes = Symbol.for('kAttributes');
+const kMessageType = Symbol.for('kMessageType')
+const kTransactionId = Symbol.for('kTransctionId')
+const kCookie = Symbol.for('kCookie')
+const kAttributes = Symbol.for('kAttributes')
 
-const EMPTY_MESSAGE_INTEGRITY = Buffer.alloc(kStunMessageIntegritySize, 0);
+const EMPTY_MESSAGE_INTEGRITY = Buffer.alloc(kStunMessageIntegritySize, 0)
 
-const toUInt32 = (x) => x >>> 0;
-const MAX_INT32 = 0x7fffffff;
-const MIN_INT32 = -2147483648;
-const isINT32 = (v) => v <= MAX_INT32 && v >= MIN_INT32;
+const toUInt32 = (x) => x >>> 0
+const MAX_INT32 = 0x7fffffff
+const MIN_INT32 = -2147483648
+const isINT32 = (v) => v <= MAX_INT32 && v >= MIN_INT32
 
 /**
  * This class implements outgoing STUN messages.
@@ -45,7 +45,7 @@ class StunRequest extends StunMessage {
    * @param {number} type - A message type, see constants.
    */
   setType(type) {
-    this[kMessageType] = Number(type);
+    this[kMessageType] = Number(type)
   }
 
   /**
@@ -55,11 +55,11 @@ class StunRequest extends StunMessage {
    */
   setTransactionId(transactionId) {
     if (!isValidTransactionId(transactionId)) {
-      return false;
+      return false
     }
 
-    this[kTransactionId] = transactionId;
-    return true;
+    this[kTransactionId] = transactionId
+    return true
   }
 
   /**
@@ -69,19 +69,19 @@ class StunRequest extends StunMessage {
    * @returns {StunAttribute|undefined} Return `false` if attribute already exist, otherwise return `true`.
    */
   addAttribute(type, ...arguments_) {
-    const attribute = attributes.create(type, ...arguments_);
-    attribute.setOwner(this);
+    const attribute = attributes.create(type, ...arguments_)
+    attribute.setOwner(this)
 
     /** @type {StunAttribute[]} */
-    const attribute_ = this[kAttributes];
+    const attribute_ = this[kAttributes]
 
     // It should be one unique attribute type per message.
     if (this.hasAttribute(type)) {
-      return undefined;
+      return undefined
     }
 
-    attribute_.push(attribute);
-    return attribute;
+    attribute_.push(attribute)
+    return attribute
   }
 
   /**
@@ -91,34 +91,34 @@ class StunRequest extends StunMessage {
    */
   removeAttribute(type) {
     /** @type {StunAttribute[]} */
-    const attribute_ = this[kAttributes];
+    const attribute_ = this[kAttributes]
 
-    const index = attribute_.findIndex((attribute) => attribute.type === type);
+    const index = attribute_.findIndex((attribute) => attribute.type === type)
 
     switch (index) {
       case -1:
-        return undefined;
+        return undefined
       case 0:
-        return attribute_.shift();
+        return attribute_.shift()
       case attribute_.length - 1:
-        return attribute_.pop();
+        return attribute_.pop()
       default:
-        break;
+        break
     }
 
-    const next = new Array(attribute_.length - 1);
-    const attribute = attribute_[index];
+    const next = new Array(attribute_.length - 1)
+    const attribute = attribute_[index]
 
     for (let j = 0, offset = 0; j < next.length; ++j) {
       if (index === j) {
-        offset = 1;
+        offset = 1
       }
 
-      next[j] = attribute_[j + offset];
+      next[j] = attribute_[j + offset]
     }
 
-    this[kAttributes] = next;
-    return attribute;
+    this[kAttributes] = next
+    return attribute
   }
 
   /**
@@ -128,7 +128,7 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addAddress(address, port) {
-    return this.addAttribute(attributeType.MAPPED_ADDRESS, address, port);
+    return this.addAttribute(attributeType.MAPPED_ADDRESS, address, port)
   }
 
   /**
@@ -138,7 +138,7 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addAlternateServer(address, port) {
-    return this.addAttribute(attributeType.ALTERNATE_SERVER, address, port);
+    return this.addAttribute(attributeType.ALTERNATE_SERVER, address, port)
   }
 
   /**
@@ -148,7 +148,7 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addXorAddress(address, port) {
-    return this.addAttribute(attributeType.XOR_MAPPED_ADDRESS, address, port);
+    return this.addAttribute(attributeType.XOR_MAPPED_ADDRESS, address, port)
   }
 
   /**
@@ -160,10 +160,10 @@ class StunRequest extends StunMessage {
     if (username.length > 513) {
       throw new Error(
         'Username should be less than 513 bytes, see' +
-          ' https://tools.ietf.org/html/rfc5389#section-15.3'
-      );
+          ' https://tools.ietf.org/html/rfc5389#section-15.3',
+      )
     }
-    return this.addAttribute(attributeType.USERNAME, username);
+    return this.addAttribute(attributeType.USERNAME, username)
   }
 
   /**
@@ -173,7 +173,7 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addError(code, reason) {
-    assertErrorType(this.type);
+    assertErrorType(this.type)
 
     // The Class represents
     // the hundreds digit of the error code.  The value MUST be between 3
@@ -181,22 +181,22 @@ class StunRequest extends StunMessage {
     // value MUST be between 0 and 99.
     if (code < 300 || code > 699) {
       throw new Error(
-        'Error code should between 300 - 699, see https://tools.ietf.org/html/rfc5389#section-15.6'
-      );
+        'Error code should between 300 - 699, see https://tools.ietf.org/html/rfc5389#section-15.6',
+      )
     }
 
     if (reason && reason.length > 128) {
       throw new Error(
-        'The reason phrase MUST be a UTF-8 encoded sequence of less than 128 characters'
-      );
+        'The reason phrase MUST be a UTF-8 encoded sequence of less than 128 characters',
+      )
     }
 
     // Set default error reason for standart error codes.
     if (!reason && constants.errorNames.has(code)) {
-      reason = constants.errorReason[constants.errorNames.get(code)];
+      reason = constants.errorReason[constants.errorNames.get(code)]
     }
 
-    return this.addAttribute(attributeType.ERROR_CODE, code, reason);
+    return this.addAttribute(attributeType.ERROR_CODE, code, reason)
   }
 
   /**
@@ -205,9 +205,9 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addRealm(realm) {
-    assert128string(realm);
+    assert128string(realm)
 
-    return this.addAttribute(attributeType.REALM, realm);
+    return this.addAttribute(attributeType.REALM, realm)
   }
 
   /**
@@ -216,9 +216,9 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addNonce(nonce) {
-    assert128string(nonce);
+    assert128string(nonce)
 
-    return this.addAttribute(attributeType.NONCE, nonce);
+    return this.addAttribute(attributeType.NONCE, nonce)
   }
 
   /**
@@ -227,9 +227,9 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addSoftware(software) {
-    assert128string(software);
+    assert128string(software)
 
-    return this.addAttribute(attributeType.SOFTWARE, software);
+    return this.addAttribute(attributeType.SOFTWARE, software)
   }
 
   /**
@@ -238,9 +238,9 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addUnknownAttributes(attributes_) {
-    assertErrorType(this.type);
+    assertErrorType(this.type)
 
-    return this.addAttribute(attributeType.UNKNOWN_ATTRIBUTES, attributes_);
+    return this.addAttribute(attributeType.UNKNOWN_ATTRIBUTES, attributes_)
   }
 
   /**
@@ -250,23 +250,23 @@ class StunRequest extends StunMessage {
    */
   addMessageIntegrity(key) {
     if (!key) {
-      return false;
+      return false
     }
 
     const attributeIntegrity = this.addAttribute(
       attributeType.MESSAGE_INTEGRITY,
-      EMPTY_MESSAGE_INTEGRITY
-    );
-    const message = this.toBuffer();
+      EMPTY_MESSAGE_INTEGRITY,
+    )
+    const message = this.toBuffer()
 
     if (message.length === 0) {
-      return false;
+      return false
     }
 
-    const hmac = crypto.createHmac('sha1', key);
-    hmac.update(message.slice(0, -kStunMessageIntegrityLength));
+    const hmac = crypto.createHmac('sha1', key)
+    hmac.update(message.slice(0, -kStunMessageIntegrityLength))
 
-    return attributeIntegrity.setValue(hmac.digest());
+    return attributeIntegrity.setValue(hmac.digest())
   }
 
   /**
@@ -275,15 +275,17 @@ class StunRequest extends StunMessage {
    * @returns {boolean} The result of an operation.
    */
   addFingerprint() {
-    const attributeFingerprint = this.addAttribute(attributeType.FINGERPRINT, 0);
-    const message = this.toBuffer();
+    const attributeFingerprint = this.addAttribute(attributeType.FINGERPRINT, 0)
+    const message = this.toBuffer()
 
     if (message.length === 0) {
-      return false;
+      return false
     }
 
-    const crc32buf = message.slice(0, -kStunFingerprintLength);
-    return attributeFingerprint.setValue(toUInt32(crc32(crc32buf) ^ kStunFingerprintXorValue));
+    const crc32buf = message.slice(0, -kStunFingerprintLength)
+    return attributeFingerprint.setValue(
+      toUInt32(crc32(crc32buf) ^ kStunFingerprintXorValue),
+    )
   }
 
   /**
@@ -293,10 +295,10 @@ class StunRequest extends StunMessage {
    */
   addPriority(priority) {
     if (!Number.isInteger(priority) || !isINT32(priority)) {
-      throw new TypeError('The argument should be 32-bit integer.');
+      throw new TypeError('The argument should be 32-bit integer.')
     }
 
-    return this.addAttribute(attributeType.PRIORITY, priority);
+    return this.addAttribute(attributeType.PRIORITY, priority)
   }
 
   /**
@@ -304,7 +306,7 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addUseCandidate() {
-    return this.addAttribute(attributeType.USE_CANDIDATE);
+    return this.addAttribute(attributeType.USE_CANDIDATE)
   }
 
   /**
@@ -313,13 +315,13 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addIceControlled(tiebreaker) {
-    assertBindingRequest(this.type);
+    assertBindingRequest(this.type)
 
     if (!Buffer.isBuffer(tiebreaker) || tiebreaker.length !== 8) {
-      throw new Error('The content of the attribute shoud be a 64-bit unsigned integer');
+      throw new Error('The content of the attribute shoud be a 64-bit unsigned integer')
     }
 
-    return this.addAttribute(attributeType.ICE_CONTROLLED, tiebreaker);
+    return this.addAttribute(attributeType.ICE_CONTROLLED, tiebreaker)
   }
 
   /**
@@ -328,13 +330,13 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addIceControlling(tiebreaker) {
-    assertBindingRequest(this.type);
+    assertBindingRequest(this.type)
 
     if (!Buffer.isBuffer(tiebreaker) || tiebreaker.length !== 8) {
-      throw new Error('The content of the attribute shoud be a 64-bit unsigned integer');
+      throw new Error('The content of the attribute shoud be a 64-bit unsigned integer')
     }
 
-    return this.addAttribute(attributeType.ICE_CONTROLLING, tiebreaker);
+    return this.addAttribute(attributeType.ICE_CONTROLLING, tiebreaker)
   }
 
   /**
@@ -345,25 +347,28 @@ class StunRequest extends StunMessage {
    */
   write(encodeStream) {
     /** @type {StunAttribute[]} */
-    const attrmap = this[kAttributes];
+    const attrmap = this[kAttributes]
 
     const attributes_ = attrmap.map((attribute) => ({
       type: attribute.type,
       value: attribute.toBuffer(),
-    }));
+    }))
 
     const packet = {
       header: {
         type: this.type,
-        length: encodingLength(attributes_, array(StunAttributePacket, attributes_.length)),
+        length: encodingLength(
+          attributes_,
+          array(StunAttributePacket, attributes_.length),
+        ),
         cookie: this[kCookie],
         transaction: this.transactionId,
       },
       attributes: attributes_,
-    };
+    }
 
-    encode(packet, encodeStream, StunMessagePacket);
-    return true;
+    encode(packet, encodeStream, StunMessagePacket)
+    return true
   }
 
   /**
@@ -371,15 +376,15 @@ class StunRequest extends StunMessage {
    * @returns {Buffer} Encoded stun message.
    */
   toBuffer() {
-    const encodeStream = createEncodeStream();
+    const encodeStream = createEncodeStream()
 
-    this.write(encodeStream);
-    return encodeStream.slice();
+    this.write(encodeStream)
+    return encodeStream.slice()
   }
 }
 
 // Soft deprecate setTransactionID().
-StunRequest.prototype.setTransactionID = StunRequest.prototype.setTransactionId;
+StunRequest.prototype.setTransactionID = StunRequest.prototype.setTransactionId
 
 /**
  * Check if tranasction id is valid.
@@ -391,7 +396,7 @@ function isValidTransactionId(transactionId) {
     Buffer.isBuffer(transactionId) &&
     (transactionId.length === kStunTransactionIdLength ||
       transactionId.length === kStunLegacyTransactionIdLength)
-  );
+  )
 }
 
 /**
@@ -400,7 +405,9 @@ function isValidTransactionId(transactionId) {
  */
 function assert128string(string) {
   if (typeof string !== 'string' || string.length > 128) {
-    throw new Error('The argument MUST be a UTF-8 encoded sequence of less than 128 characters');
+    throw new Error(
+      'The argument MUST be a UTF-8 encoded sequence of less than 128 characters',
+    )
   }
 }
 
@@ -412,10 +419,10 @@ function assertErrorType(type) {
   const isErrorType =
     type === messageType.BINDING_ERROR_RESPONSE ||
     type === messageType.ALLOCATE_ERROR_RESPONSE ||
-    type === messageType.REFRESH_ERROR_RESPONSE;
+    type === messageType.REFRESH_ERROR_RESPONSE
 
   if (!isErrorType) {
-    throw new Error('The attribute should be in ERROR_RESPONSE messages');
+    throw new Error('The attribute should be in ERROR_RESPONSE messages')
   }
 }
 
@@ -425,8 +432,8 @@ function assertErrorType(type) {
  */
 function assertBindingRequest(type) {
   if (type !== messageType.BINDING_REQUEST) {
-    throw new Error('The attribute should present in a Binding request.');
+    throw new Error('The attribute should present in a Binding request.')
   }
 }
 
-module.exports = StunRequest;
+module.exports = StunRequest

@@ -1,15 +1,15 @@
-'use strict';
+'use strict'
 
-const constants = require('../lib/constants');
+const constants = require('../lib/constants')
 
-const { kStunTransactionIdLength } = constants;
+const { kStunTransactionIdLength } = constants
 
-const kMessageType = Symbol.for('kMessageType');
-const kTransactionId = Symbol.for('kTransctionId');
-const kCookie = Symbol.for('kCookie');
-const kAttributes = Symbol.for('kAttributes');
+const kMessageType = Symbol.for('kMessageType')
+const kTransactionId = Symbol.for('kTransctionId')
+const kCookie = Symbol.for('kCookie')
+const kAttributes = Symbol.for('kAttributes')
 
-const EMPTY_TRANSACTION_ID = Buffer.alloc(kStunTransactionIdLength, 0);
+const EMPTY_TRANSACTION_ID = Buffer.alloc(kStunTransactionIdLength, 0)
 
 /**
  * Base class for a STUN message.
@@ -19,10 +19,10 @@ module.exports = class StunMessage {
    * @class StunMessage
    */
   constructor() {
-    this[kMessageType] = 0;
-    this[kTransactionId] = EMPTY_TRANSACTION_ID;
-    this[kCookie] = constants.kStunMagicCookie;
-    this[kAttributes] = [];
+    this[kMessageType] = 0
+    this[kTransactionId] = EMPTY_TRANSACTION_ID
+    this[kCookie] = constants.kStunMagicCookie
+    this[kAttributes] = []
   }
 
   /**
@@ -30,7 +30,7 @@ module.exports = class StunMessage {
    * @returns {number}
    */
   get type() {
-    return this[kMessageType];
+    return this[kMessageType]
   }
 
   /**
@@ -38,7 +38,7 @@ module.exports = class StunMessage {
    * @returns {Buffer}
    */
   get transactionId() {
-    return this[kTransactionId];
+    return this[kTransactionId]
   }
 
   /**
@@ -46,7 +46,7 @@ module.exports = class StunMessage {
    * @returns {boolean} The result of an operation.
    */
   isLegacy() {
-    return this[kCookie] !== constants.kStunMagicCookie;
+    return this[kCookie] !== constants.kStunMagicCookie
   }
 
   /**
@@ -55,9 +55,9 @@ module.exports = class StunMessage {
    */
   get count() {
     /** @type {StunAttribute[]} */
-    const attribute = this[kAttributes];
+    const attribute = this[kAttributes]
 
-    return attribute.length;
+    return attribute.length
   }
 
   /**
@@ -67,9 +67,9 @@ module.exports = class StunMessage {
    */
   getAttribute(type) {
     /** @type {StunAttribute[]} */
-    const attributes = this[kAttributes];
+    const attributes = this[kAttributes]
 
-    return attributes.find((attribute) => attribute.type === type);
+    return attributes.find((attribute) => attribute.type === type)
   }
 
   /**
@@ -78,7 +78,7 @@ module.exports = class StunMessage {
    * @returns {boolean}
    */
   hasAttribute(type) {
-    return this.getAttribute(type) !== undefined;
+    return this.getAttribute(type) !== undefined
   }
 
   /**
@@ -86,7 +86,7 @@ module.exports = class StunMessage {
    */
   *[Symbol.iterator]() {
     for (const attribute of this[kAttributes]) {
-      yield attribute;
+      yield attribute
     }
   }
-};
+}

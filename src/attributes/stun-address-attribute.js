@@ -1,33 +1,33 @@
-'use strict';
+'use strict'
 
-const net = require('net');
-const assert = require('assert');
+const net = require('net')
+const assert = require('assert')
 const {
   encode,
   decode,
   types: { uint8, uint16be, buffer, reserved },
-} = require('binary-data');
-const ipa = require('ipaddr.js');
-const { pton4, pton6 } = require('ip2buf');
-const constants = require('../lib/constants');
-const StunAttribute = require('./stun-attribute');
+} = require('binary-data')
+const ipa = require('ipaddr.js')
+const { pton4, pton6 } = require('ip2buf')
+const constants = require('../lib/constants')
+const StunAttribute = require('./stun-attribute')
 
-const STUN_ADDRESS_4 = 1;
-const STUN_ADDRESS_6 = 2;
+const STUN_ADDRESS_4 = 1
+const STUN_ADDRESS_6 = 2
 
-const FAMILY_4 = 'IPv4';
-const FAMILY_6 = 'IPv6';
+const FAMILY_4 = 'IPv4'
+const FAMILY_6 = 'IPv6'
 
 const AddressPacket = {
   $reserved: reserved(uint8, 1),
   family: uint8,
   port: uint16be,
   address: buffer(({ node }) => (node.family === STUN_ADDRESS_4 ? 4 : 16)),
-};
+}
 
-const kPort = Symbol('kPort');
-const kAddress = Symbol('kAddress');
-const kFamily = Symbol('kFamily');
+const kPort = Symbol('kPort')
+const kAddress = Symbol('kAddress')
+const kFamily = Symbol('kFamily')
 
 /**
  * This class implements STUN attribute for ip/port pair.
@@ -40,14 +40,14 @@ module.exports = class StunAddressAttribute extends StunAttribute {
    * @param {number} port
    */
   constructor(type, address, port) {
-    super(type);
+    super(type)
 
-    this[kPort] = 0;
-    this[kAddress] = null;
-    this[kFamily] = null;
+    this[kPort] = 0
+    this[kAddress] = null
+    this[kFamily] = null
 
-    this.setPort(port);
-    this.setAddress(address);
+    this.setPort(port)
+    this.setAddress(address)
   }
 
   /**
@@ -57,14 +57,14 @@ module.exports = class StunAddressAttribute extends StunAttribute {
    * @returns {StunAddressAttribute}
    */
   static from(type, message) {
-    const { address, port } = StunAddressAttribute.decode(message);
+    const { address, port } = StunAddressAttribute.decode(message)
 
-    const ipaddr = ipa.fromByteArray(address).toString();
+    const ipaddr = ipa.fromByteArray(address).toString()
 
-    assert(isPort(port));
-    assert(net.isIP(ipaddr));
+    assert(isPort(port))
+    assert(net.isIP(ipaddr))
 
-    return new StunAddressAttribute(type, ipaddr, port);
+    return new StunAddressAttribute(type, ipaddr, port)
   }
 
   /**
@@ -74,7 +74,7 @@ module.exports = class StunAddressAttribute extends StunAttribute {
    * @private
    */
   static decode(message) {
-    return decode(message, AddressPacket);
+    return decode(message, AddressPacket)
   }
 
   /**
@@ -82,7 +82,7 @@ module.exports = class StunAddressAttribute extends StunAttribute {
    * @returns {number}
    */
   get valueType() {
-    return constants.attributeValueType.ADDRESS;
+    return constants.attributeValueType.ADDRESS
   }
 
   /**
@@ -93,7 +93,7 @@ module.exports = class StunAddressAttribute extends StunAttribute {
       port: this[kPort],
       family: this[kFamily],
       address: this[kAddress],
-    };
+    }
   }
 
   /**
@@ -103,11 +103,11 @@ module.exports = class StunAddressAttribute extends StunAttribute {
    */
   setPort(port) {
     if (isPort(port)) {
-      this[kPort] = port;
-      return true;
+      this[kPort] = port
+      return true
     }
 
-    return false;
+    return false
   }
 
   /**
@@ -117,13 +117,13 @@ module.exports = class StunAddressAttribute extends StunAttribute {
    */
   setAddress(address) {
     if (net.isIP(address)) {
-      this[kAddress] = address;
-      this[kFamily] = net.isIPv4(address) ? FAMILY_4 : FAMILY_6;
+      this[kAddress] = address
+      this[kFamily] = net.isIPv4(address) ? FAMILY_4 : FAMILY_6
 
-      return true;
+      return true
     }
 
-    return false;
+    return false
   }
 
   /**
@@ -131,7 +131,7 @@ module.exports = class StunAddressAttribute extends StunAttribute {
    * @returns {Object}
    */
   writeValue() {
-    return this.value;
+    return this.value
   }
 
   /**
@@ -140,20 +140,20 @@ module.exports = class StunAddressAttribute extends StunAttribute {
    * @returns {bool}
    */
   write(encodeStream) {
-    const packet = this.writeValue();
+    const packet = this.writeValue()
 
     if (packet.family === FAMILY_4) {
-      packet.family = STUN_ADDRESS_4;
-      packet.address = pton4(packet.address);
+      packet.family = STUN_ADDRESS_4
+      packet.address = pton4(packet.address)
     } else {
-      packet.family = STUN_ADDRESS_6;
-      packet.address = pton6(packet.address);
+      packet.family = STUN_ADDRESS_6
+      packet.address = pton6(packet.address)
     }
 
-    encode(packet, encodeStream, AddressPacket);
-    return true;
+    encode(packet, encodeStream, AddressPacket)
+    return true
   }
-};
+}
 
 /**
  * Check if argument is valid port.
@@ -161,5 +161,5 @@ module.exports = class StunAddressAttribute extends StunAttribute {
  * @returns {bool}
  */
 function isPort(port) {
-  return Number.isInteger(port) && port > 0 && port < 2 << 15;
+  return Number.isInteger(port) && port > 0 && port < 2 << 15
 }

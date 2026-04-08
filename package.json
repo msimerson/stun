@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "npx eslint .",
-    "lint-fix": "npx eslint --fix .",
+    "lint:fix": "npx eslint --fix .",
     "prettier": "npx prettier --check .",
     "prettier:fix": "npx prettier --write .",
     "test": "node --test test/index.js test/lib/*.js test/attributes/*.js test/message/*.js test/net/*.js",
@@ -16,7 +16,9 @@
   },
   "bin": "./src/cli.js",
   "files": [
-    "src", "examples", "CHANGELOG.md"
+    "src",
+    "examples",
+    "CHANGELOG.md"
   ],
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
-'use strict';
+'use strict'
 
-const StunMessage = require('./message');
-const { attributeType } = require('../lib/constants');
+const StunMessage = require('./message')
+const { attributeType } = require('../lib/constants')
 
 /**
  * Get a value of an attribute of the message.
@@ -10,10 +10,10 @@ const { attributeType } = require('../lib/constants');
  * @returns {*}
  */
 function getAttribute(message, type) {
-  const attribute = message.getAttribute(type);
+  const attribute = message.getAttribute(type)
 
   if (typeof attribute !== 'undefined') {
-    return attribute.value;
+    return attribute.value
   }
 }
 
@@ -24,10 +24,10 @@ function getAttribute(message, type) {
  * @returns {string}
  */
 function getStringAttribute(message, type) {
-  const attribute = getAttribute(message, type);
+  const attribute = getAttribute(message, type)
 
   if (Buffer.isBuffer(attribute)) {
-    return attribute.toString();
+    return attribute.toString()
   }
 }
 
@@ -53,7 +53,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {AddressType}
    */
   getAddress() {
-    return getAttribute(this, attributeType.MAPPED_ADDRESS);
+    return getAttribute(this, attributeType.MAPPED_ADDRESS)
   }
 
   /**
@@ -61,7 +61,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {AddressType}
    */
   getXorAddress() {
-    return getAttribute(this, attributeType.XOR_MAPPED_ADDRESS);
+    return getAttribute(this, attributeType.XOR_MAPPED_ADDRESS)
   }
 
   /**
@@ -69,7 +69,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {AddressType}
    */
   getAlternateServer() {
-    return getAttribute(this, attributeType.ALTERNATE_SERVER);
+    return getAttribute(this, attributeType.ALTERNATE_SERVER)
   }
 
   /**
@@ -77,7 +77,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {string}
    */
   getUsername() {
-    return getStringAttribute(this, attributeType.USERNAME);
+    return getStringAttribute(this, attributeType.USERNAME)
   }
 
   /**
@@ -85,7 +85,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {ErrorType}
    */
   getError() {
-    return getAttribute(this, attributeType.ERROR_CODE);
+    return getAttribute(this, attributeType.ERROR_CODE)
   }
 
   /**
@@ -93,7 +93,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {string}
    */
   getRealm() {
-    return getStringAttribute(this, attributeType.REALM);
+    return getStringAttribute(this, attributeType.REALM)
   }
 
   /**
@@ -101,7 +101,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {string}
    */
   getNonce() {
-    return getStringAttribute(this, attributeType.NONCE);
+    return getStringAttribute(this, attributeType.NONCE)
   }
 
   /**
@@ -109,7 +109,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {string}
    */
   getSoftware() {
-    return getStringAttribute(this, attributeType.SOFTWARE);
+    return getStringAttribute(this, attributeType.SOFTWARE)
   }
 
   /**
@@ -117,7 +117,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {number[]}
    */
   getUnknownAttributes() {
-    return getAttribute(this, attributeType.UNKNOWN_ATTRIBUTES);
+    return getAttribute(this, attributeType.UNKNOWN_ATTRIBUTES)
   }
 
   /**
@@ -125,7 +125,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {Buffer}
    */
   getMessageIntegrity() {
-    return getAttribute(this, attributeType.MESSAGE_INTEGRITY);
+    return getAttribute(this, attributeType.MESSAGE_INTEGRITY)
   }
 
   /**
@@ -133,10 +133,10 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {number}
    */
   getFingerprint() {
-    const attribute = getAttribute(this, attributeType.FINGERPRINT);
+    const attribute = getAttribute(this, attributeType.FINGERPRINT)
 
     if (typeof attribute === 'number') {
-      return attribute.value >>> 0;
+      return attribute.value >>> 0
     }
   }
 
@@ -145,10 +145,10 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {number}
    */
   getPriority() {
-    const attribute = getAttribute(this, attributeType.PRIORITY);
+    const attribute = getAttribute(this, attributeType.PRIORITY)
 
     if (typeof attribute === 'number') {
-      return attribute.value >> 0;
+      return attribute.value >> 0
     }
   }
 
@@ -157,7 +157,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {Buffer}
    */
   getIceControlled() {
-    return getAttribute(this, attributeType.ICE_CONTROLLED);
+    return getAttribute(this, attributeType.ICE_CONTROLLED)
   }
 
   /**
@@ -165,6 +165,6 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {Buffer}
    */
   getIceControlling() {
-    return getAttribute(this, attributeType.ICE_CONTROLLING);
+    return getAttribute(this, attributeType.ICE_CONTROLLING)
   }
-};
+}

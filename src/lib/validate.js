@@ -1,19 +1,20 @@
-'use strict';
+'use strict'
 
-const crypto = require('crypto');
-const crc32 = require('turbo-crc32/crc32');
-const constants = require('./constants');
-const encode = require('../message/encode');
+const crypto = require('crypto')
+const crc32 = require('turbo-crc32/crc32')
+const constants = require('./constants')
+const encode = require('../message/encode')
 
-const { FINGERPRINT, MESSAGE_INTEGRITY } = constants.attributeType;
-const { kStunFingerprintXorValue, kStunFingerprintLength, kStunMessageIntegrityLength } = constants;
+const { FINGERPRINT, MESSAGE_INTEGRITY } = constants.attributeType
+const { kStunFingerprintXorValue, kStunFingerprintLength, kStunMessageIntegrityLength } =
+  constants
 
 module.exports = {
   validateFingerprint,
   validateMessageIntegrity,
-};
+}
 
-const toUInt32 = (x) => x >>> 0;
+const toUInt32 = (x) => x >>> 0
 
 /**
  * Verifies that a given buffer is STUN by checking for a correct FINGERPRINT.
@@ -22,19 +23,19 @@ const toUInt32 = (x) => x >>> 0;
  */
 function validateFingerprint(message) {
   if (message.isLegacy()) {
-    return false;
+    return false
   }
 
-  const fingerprintAttribute = message.getAttribute(FINGERPRINT);
+  const fingerprintAttribute = message.getAttribute(FINGERPRINT)
 
   if (fingerprintAttribute === undefined) {
-    return false;
+    return false
   }
 
-  const crc32buf = encode(message).slice(0, -kStunFingerprintLength);
-  const currentCRC32 = fingerprintAttribute.value;
+  const crc32buf = encode(message).slice(0, -kStunFingerprintLength)
+  const currentCRC32 = fingerprintAttribute.value
 
-  return toUInt32(crc32(crc32buf) ^ kStunFingerprintXorValue) === currentCRC32;
+  return toUInt32(crc32(crc32buf) ^ kStunFingerprintXorValue) === currentCRC32
 }
 
 /**
@@ -44,34 +45,34 @@ function validateFingerprint(message) {
  * @returns {bool}
  */
 function validateMessageIntegrity(message, password) {
-  let offsetEnd = 0;
+  let offsetEnd = 0
 
-  const fingerprintAttribute = message.getAttribute(FINGERPRINT);
-  const messageIntegrityAttribute = message.getAttribute(MESSAGE_INTEGRITY);
+  const fingerprintAttribute = message.getAttribute(FINGERPRINT)
+  const messageIntegrityAttribute = message.getAttribute(MESSAGE_INTEGRITY)
 
-  const isFingerprintExist = fingerprintAttribute !== undefined;
+  const isFingerprintExist = fingerprintAttribute !== undefined
 
   // Calc offsets if FINGERPRINT attribute exist.
   if (isFingerprintExist) {
-    offsetEnd += kStunFingerprintLength;
+    offsetEnd += kStunFingerprintLength
   }
 
   if (messageIntegrityAttribute === undefined) {
-    return false;
+    return false
   }
 
-  offsetEnd += kStunMessageIntegrityLength;
+  offsetEnd += kStunMessageIntegrityLength
 
-  const buf = encode(message).slice(0, -offsetEnd);
+  const buf = encode(message).slice(0, -offsetEnd)
 
   // Remove length of FINGERPRINT attribute from message size.
   if (isFingerprintExist) {
-    const currentLength = buf.readUInt16BE(2);
-    buf.writeUInt16BE(currentLength - kStunFingerprintLength, 2);
+    const currentLength = buf.readUInt16BE(2)
+    buf.writeUInt16BE(currentLength - kStunFingerprintLength, 2)
   }
 
-  const hmac = crypto.createHmac('sha1', password);
-  hmac.update(buf);
+  const hmac = crypto.createHmac('sha1', password)
+  hmac.update(buf)
 
-  return hmac.digest().equals(messageIntegrityAttribute.value);
+  return hmac.digest().equals(messageIntegrityAttribute.value)
 }

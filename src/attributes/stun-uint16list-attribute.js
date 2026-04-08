@@ -1,14 +1,14 @@
-'use strict';
+'use strict'
 
 const {
   encode,
   decode,
   types: { uint16be, array },
-} = require('binary-data');
-const constants = require('../lib/constants');
-const StunAttribute = require('./stun-attribute');
+} = require('binary-data')
+const constants = require('../lib/constants')
+const StunAttribute = require('./stun-attribute')
 
-const kAttributeTypes = Symbol('kAttributeTypes');
+const kAttributeTypes = Symbol('kAttributeTypes')
 
 module.exports = class StunUInt16ListAttribute extends StunAttribute {
   /**
@@ -17,9 +17,9 @@ module.exports = class StunUInt16ListAttribute extends StunAttribute {
    * @param {number[]} values
    */
   constructor(type, values) {
-    super(type);
+    super(type)
 
-    this[kAttributeTypes] = new Set(values);
+    this[kAttributeTypes] = new Set(values)
   }
 
   /**
@@ -29,20 +29,20 @@ module.exports = class StunUInt16ListAttribute extends StunAttribute {
    * @returns {StunUInt16ListAttribute}
    */
   static from(type, message) {
-    const length = message.length / 2;
-    const schema = array(uint16be, length);
+    const length = message.length / 2
+    const schema = array(uint16be, length)
 
-    const packet = new StunUInt16ListAttribute(type);
+    const packet = new StunUInt16ListAttribute(type)
 
-    decode(message, schema).map((value) => packet.addType(value));
-    return packet;
+    decode(message, schema).map((value) => packet.addType(value))
+    return packet
   }
 
   /**
    * Get the number of values in the list.
    */
   get length() {
-    return this[kAttributeTypes].size;
+    return this[kAttributeTypes].size
   }
 
   /**
@@ -50,7 +50,7 @@ module.exports = class StunUInt16ListAttribute extends StunAttribute {
    * @returns {number[]}
    */
   get value() {
-    return [...this[kAttributeTypes]];
+    return [...this[kAttributeTypes]]
   }
 
   /**
@@ -58,7 +58,7 @@ module.exports = class StunUInt16ListAttribute extends StunAttribute {
    * @returns {number}
    */
   get valueType() {
-    return constants.attributeValueType.UINT16_LIST;
+    return constants.attributeValueType.UINT16_LIST
   }
 
   /**
@@ -68,11 +68,11 @@ module.exports = class StunUInt16ListAttribute extends StunAttribute {
    */
   addType(type) {
     if (!Number.isSafeInteger(type)) {
-      return false;
+      return false
     }
 
-    this[kAttributeTypes].add(type);
-    return true;
+    this[kAttributeTypes].add(type)
+    return true
   }
 
   /**
@@ -81,13 +81,13 @@ module.exports = class StunUInt16ListAttribute extends StunAttribute {
    * @returns {bool}
    */
   write(encodeStream) {
-    const schema = array(uint16be, this.length);
+    const schema = array(uint16be, this.length)
 
     if (this.length === 0) {
-      return true;
+      return true
     }
 
-    encode(this.value, encodeStream, schema);
-    return true;
+    encode(this.value, encodeStream, schema)
+    return true
   }
-};
+}

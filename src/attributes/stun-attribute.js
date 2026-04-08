@@ -1,10 +1,10 @@
-'use strict';
+'use strict'
 
-const { createEncodeStream } = require('binary-data');
+const { createEncodeStream } = require('binary-data')
 
-const EMPTY_BUFFER = Buffer.alloc(0);
+const EMPTY_BUFFER = Buffer.alloc(0)
 
-const kAttributeType = Symbol('kAttributeType');
+const kAttributeType = Symbol('kAttributeType')
 
 /**
  * This class implements an abstract STUN attribute.
@@ -15,7 +15,7 @@ module.exports = class StunAttribute {
    * @param {number} type Attribute type.
    */
   constructor(type) {
-    this[kAttributeType] = type;
+    this[kAttributeType] = type
   }
 
   /**
@@ -23,14 +23,14 @@ module.exports = class StunAttribute {
    * @returns {number}
    */
   get type() {
-    return this[kAttributeType];
+    return this[kAttributeType]
   }
 
   /**
    * Get attribute value.
    */
   get value() {
-    throw new Error('Not implemented');
+    throw new Error('Not implemented')
   }
 
   /**
@@ -38,7 +38,7 @@ module.exports = class StunAttribute {
    * @returns {number}
    */
   get valueType() {
-    return -1;
+    return -1
   }
 
   /**
@@ -46,7 +46,7 @@ module.exports = class StunAttribute {
    * @returns {bool}
    */
   setValue() {
-    return false;
+    return false
   }
 
   /**
@@ -54,14 +54,14 @@ module.exports = class StunAttribute {
    * @returns {bool}
    */
   setOwner() /* virtual */ {
-    return false;
+    return false
   }
 
   /**
    * @private
    */
   write() {
-    throw new Error('Not implemented');
+    throw new Error('Not implemented')
   }
 
   /**
@@ -70,12 +70,12 @@ module.exports = class StunAttribute {
    * @returns {Buffer}
    */
   toBuffer() {
-    const encodeStream = createEncodeStream();
+    const encodeStream = createEncodeStream()
 
     if (this.write(encodeStream)) {
-      return encodeStream.slice();
+      return encodeStream.slice()
     }
 
-    return EMPTY_BUFFER;
+    return EMPTY_BUFFER
   }
-};
+}

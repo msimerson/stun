@@ -1,8 +1,8 @@
-'use strict';
+'use strict'
 
 module.exports = {
   createMessageType,
-};
+}
 
 /**
  * Format of STUN Message Type Field defined in RFC 5389.
@@ -27,30 +27,30 @@ module.exports = {
  */
 function createMessageType(method, clas) {
   if (!isNumber(method) || !isNumber(clas)) {
-    throw new TypeError('Expected number.');
+    throw new TypeError('Expected number.')
   }
 
-  const firstBit = clas & 0b1;
-  const secondBit = (clas & 0b10) >> 1;
+  const firstBit = clas & 0b1
+  const secondBit = (clas & 0b10) >> 1
 
-  const part03 = method & 0b1111;
-  const part46 = (method & 0b1110000) >> 4;
-  const partLast = method >> 7;
+  const part03 = method & 0b1111
+  const part46 = (method & 0b1110000) >> 4
+  const partLast = method >> 7
 
   // Last 2 bits of message type should be 0.
   if (partLast > 0b11111) {
-    throw new Error('Invalid method.');
+    throw new Error('Invalid method.')
   }
 
-  let type = 0;
+  let type = 0
 
-  type |= part03;
-  type |= firstBit << 4;
-  type |= part46 << 5;
-  type |= secondBit << 8;
-  type |= partLast << 9;
+  type |= part03
+  type |= firstBit << 4
+  type |= part46 << 5
+  type |= secondBit << 8
+  type |= partLast << 9
 
-  return type;
+  return type
 }
 
 /**
@@ -59,5 +59,5 @@ function createMessageType(method, clas) {
  * @returns {bool}
  */
 function isNumber(m) {
-  return Number.isSafeInteger(m) && !Number.isNaN(m);
+  return Number.isSafeInteger(m) && !Number.isNaN(m)
 }

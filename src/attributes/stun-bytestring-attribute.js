@@ -1,13 +1,13 @@
-'use strict';
+'use strict'
 
 const {
   encode,
   types: { buffer },
-} = require('binary-data');
-const constants = require('../lib/constants');
-const StunAttribute = require('./stun-attribute');
+} = require('binary-data')
+const constants = require('../lib/constants')
+const StunAttribute = require('./stun-attribute')
 
-const kValue = Symbol('kValue');
+const kValue = Symbol('kValue')
 
 /**
  * This class implements STUN attribute for strings and buffers.
@@ -20,10 +20,10 @@ module.exports = class StunByteStringAttribute extends StunAttribute {
    * @param {string} encoding
    */
   constructor(type, value, encoding = 'utf8') {
-    super(type);
+    super(type)
 
-    this[kValue] = null;
-    this.setValue(value, encoding);
+    this[kValue] = null
+    this.setValue(value, encoding)
   }
 
   /**
@@ -33,14 +33,14 @@ module.exports = class StunByteStringAttribute extends StunAttribute {
    * @returns {StunByteStringAttribute}
    */
   static from(type, message) {
-    return new StunByteStringAttribute(type, message);
+    return new StunByteStringAttribute(type, message)
   }
 
   /**
    * Get attribute value.
    */
   get value() {
-    return this[kValue];
+    return this[kValue]
   }
 
   /**
@@ -48,7 +48,7 @@ module.exports = class StunByteStringAttribute extends StunAttribute {
    * @returns {number}
    */
   get valueType() {
-    return constants.attributeValueType.BYTE_STRING;
+    return constants.attributeValueType.BYTE_STRING
   }
 
   /**
@@ -59,16 +59,16 @@ module.exports = class StunByteStringAttribute extends StunAttribute {
    */
   setValue(value, encoding = 'utf8') {
     if (Buffer.isBuffer(value)) {
-      this[kValue] = value;
-      return true;
+      this[kValue] = value
+      return true
     }
 
     if (typeof value === 'string') {
-      this[kValue] = Buffer.from(value, encoding);
-      return true;
+      this[kValue] = Buffer.from(value, encoding)
+      return true
     }
 
-    return false;
+    return false
   }
 
   /**
@@ -78,10 +78,10 @@ module.exports = class StunByteStringAttribute extends StunAttribute {
    */
   write(encodeStream) {
     if (!this.value) {
-      return false;
+      return false
     }
 
-    encode(this.value, encodeStream, buffer(this.value.length));
-    return true;
+    encode(this.value, encodeStream, buffer(this.value.length))
+    return true
   }
-};
+}
