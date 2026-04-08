@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/msimerson/stun/actions/workflows/ci.yml/badge.svg)](https://github.com/msimerson/stun/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/msimerson/stun/badge.svg?branch=master)](https://coveralls.io/github/msimerson/stun)
 
-Session Traversal Utilities for NAT (STUN) server. Implements [RFC5389](https://tools.ietf.org/html/rfc5389) with partial support [RFC5766](https://tools.ietf.org/html/rfc5766), [RFC5245](https://tools.ietf.org/html/rfc5245), [RFC5780](https://tools.ietf.org/html/rfc5780).
+Session Traversal Utilities for NAT (STUN) server. Implements [8489](https://tools.ietf.org/html/rfc8489), [RFC7064](https://tools.ietf.org/html/rfc7064), [RFC5389](https://tools.ietf.org/html/rfc5389) with partial support for [RFC5766](https://tools.ietf.org/html/rfc5766), [RFC5245](https://tools.ietf.org/html/rfc5245), [RFC5780](https://tools.ietf.org/html/rfc5780).
 
 ## Install
 
