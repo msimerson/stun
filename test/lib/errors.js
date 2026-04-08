@@ -1,7 +1,7 @@
 'use strict';
 
-const { test } = require('node:test')
-const assert = require('node:assert/strict')
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
 
 const { StunMessageError, StunResponseError } = require('../../src/lib/errors');
 const { messageType } = require('../../src/lib/constants');

@@ -1,7 +1,7 @@
 'use strict';
 
-const { test } = require('node:test')
-const assert = require('node:assert/strict')
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
 
 const StunResponse = require('../../src/message/response');
 const decode = require('../../src/message/decode');

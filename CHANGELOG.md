@@ -4,7 +4,10 @@ All notable changes to the "stun" package will be documented in this file.
 
 ### NEXT
 
+- dep(eslint): upgrade to v10
 - dep(jest): use node:test for test runner
+- ci: updates
+- p.json: added test:coverage script
 
 ### [3.0.2] - 2024-11-13
 

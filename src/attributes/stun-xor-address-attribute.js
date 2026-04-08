@@ -84,7 +84,6 @@ module.exports = class StunXorAddressAttribute extends StunAddressAttribute {
  * @returns {number}
  */
 function xorPort(port) {
-  // eslint-disable-next-line no-bitwise
   return port ^ (constants.kStunMagicCookie >> 16);
 }
 
@@ -94,7 +93,7 @@ function xorPort(port) {
  * @returns {string}
  */
 function xorIP(address, owner) {
-  let xored = null;
+  let xored;
 
   if (net.isIPv4(address)) {
     xored = xorIPv4(pton4(address));

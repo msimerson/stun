@@ -1,7 +1,7 @@
 'use strict';
 
-const { describe, test } = require('node:test')
-const assert = require('node:assert/strict')
+const { describe, test } = require('node:test');
+const assert = require('node:assert/strict');
 
 const constants = require('../../src/lib/constants');
 const StunAttribute = require('../../src/attributes/stun-attribute');
@@ -211,10 +211,7 @@ test('add invalid nonce', () => {
   const message = new StunRequest();
 
   message.setType(messageType.BINDING_RESPONSE);
-  assert.throws(
-    () => message.addNonce('stun/1.2.3'.repeat(13)),
-    /less than 128 characters/i
-  );
+  assert.throws(() => message.addNonce('stun/1.2.3'.repeat(13)), /less than 128 characters/i);
   assert.equal(message.count, 0);
 });
 
@@ -344,10 +341,11 @@ test('add PRIORITY', () => {
   assert.equal(attributes[0].type, attributeType.PRIORITY);
   assert.equal(attributes[0].value, 123);
 
+  assert.throws(() => message.addPriority(1.23), /The argument should be 32-bit integer/i);
   assert.throws(
-    () => message.addPriority(1.23), /The argument should be 32-bit integer/i);
-  assert.throws(
-    () => message.addPriority(Number.MAX_SAFE_INTEGER), /The argument should be 32-bit integer/i);
+    () => message.addPriority(Number.MAX_SAFE_INTEGER),
+    /The argument should be 32-bit integer/i
+  );
 });
 
 test('add USE-CANDIDATE', () => {
@@ -375,14 +373,13 @@ test('add ICE-CONTROLLED', () => {
   assert.equal(attributes[0].value, tiebreaker);
 
   assert.throws(() => message.addIceControlled(123), /shoud be a 64-bit unsigned integer/i);
-  assert.throws(() => message.addIceControlled(invalidTiebreaker), 
+  assert.throws(
+    () => message.addIceControlled(invalidTiebreaker),
     /shoud be a 64-bit unsigned integer/i
   );
 
   message.setType(constants.messageType.BINDING_ERROR_RESPONSE);
-  assert.throws(() => message.addIceControlled(tiebreaker), 
-    /should present in a Binding request/i
-  );
+  assert.throws(() => message.addIceControlled(tiebreaker), /should present in a Binding request/i);
 });
 
 test('add ICE-CONTROLLING', () => {
@@ -400,12 +397,14 @@ test('add ICE-CONTROLLING', () => {
   assert.equal(attributes[0].value, tiebreaker);
 
   assert.throws(() => message.addIceControlling(123), /shoud be a 64-bit unsigned integer/i);
-  assert.throws(() => message.addIceControlling(invalidTiebreaker), 
+  assert.throws(
+    () => message.addIceControlling(invalidTiebreaker),
     /shoud be a 64-bit unsigned integer/i
   );
 
   message.setType(constants.messageType.BINDING_ERROR_RESPONSE);
-  assert.throws(() => message.addIceControlling(tiebreaker), 
+  assert.throws(
+    () => message.addIceControlling(tiebreaker),
     /should present in a Binding request/i
   );
 });

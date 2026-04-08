@@ -1,7 +1,7 @@
 'use strict';
 
-const { test } = require('node:test')
-const assert = require('node:assert/strict')
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
 
 const StunUInt16ListAttribute = require('../../src/attributes/stun-uint16list-attribute');
 const constants = require('../../src/lib/constants');

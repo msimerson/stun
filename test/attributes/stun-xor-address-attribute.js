@@ -1,7 +1,7 @@
 'use strict';
 
-const { test } = require('node:test')
-const assert = require('node:assert/strict')
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
 
 const StunXorAddressAttribute = require('../../src/attributes/stun-xor-address-attribute');
 const constants = require('../../src/lib/constants');

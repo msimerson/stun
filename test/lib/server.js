@@ -1,7 +1,7 @@
 'use strict';
 
-const { test } = require('node:test')
-const assert = require('node:assert/strict')
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
 
 const Emitter = require('events');
 const Server = require('../../src/net/dgram-server');
@@ -10,7 +10,9 @@ const { messageType } = require('../../src/lib/constants');
 const { createMessage } = require('../../src/lib/create-message');
 
 function mockFn() {
-  const fn = function(...args) { fn.calls.push(args); };
+  const fn = function (...args) {
+    fn.calls.push(args);
+  };
   fn.calls = [];
   return fn;
 }

@@ -1,7 +1,7 @@
 'use strict';
 
-const { describe, test } = require('node:test')
-const assert = require('node:assert/strict')
+const { describe, test } = require('node:test');
+const assert = require('node:assert/strict');
 
 const stun = require('../src/index');
 const constants = require('../src/lib/constants');
@@ -34,7 +34,7 @@ describe('should export constants', () => {
     const type = `STUN_${messageType}`;
 
     test(`should export ${type}`, () => {
-      assert.equal(stun.constants[type], constants.messageType[messageType])
+      assert.equal(stun.constants[type], constants.messageType[messageType]);
     });
   }
 
@@ -42,7 +42,7 @@ describe('should export constants', () => {
     const code = `STUN_CODE_${errorCode}`;
 
     test(`should export ${code}`, () => {
-      assert.equal(stun.constants[code], constants.errorCode[errorCode])
+      assert.equal(stun.constants[code], constants.errorCode[errorCode]);
     });
   }
 
@@ -50,7 +50,7 @@ describe('should export constants', () => {
     const reason = `STUN_REASON_${errorReason}`;
 
     test(`should export ${reason}`, () => {
-      assert.equal(stun.constants[reason], constants.errorReason[errorReason])
+      assert.equal(stun.constants[reason], constants.errorReason[errorReason]);
     });
   }
 
@@ -58,7 +58,7 @@ describe('should export constants', () => {
     const attribute = `STUN_ATTR_${attributeType}`;
 
     test(`should export ${attribute}`, () => {
-      assert.equal(stun.constants[attribute], constants.attributeType[attributeType])
+      assert.equal(stun.constants[attribute], constants.attributeType[attributeType]);
     });
   }
 
@@ -66,7 +66,7 @@ describe('should export constants', () => {
     const event = `STUN_${eventName}`;
 
     test(`should export ${event}`, () => {
-      assert.equal(stun.constants[event], constants.eventNames[eventName])
+      assert.equal(stun.constants[event], constants.eventNames[eventName]);
     });
   }
 });

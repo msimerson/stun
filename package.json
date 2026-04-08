@@ -31,13 +31,17 @@
     "url": "https://github.com/msimerson/stun/issues"
   },
   "homepage": "https://github.com/msimerson/stun#readme",
-  "devDependencies": {},
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.2.0",
+    "globals": "^17.4.0"
+  },
   "dependencies": {
     "binary-data": "^0.6.0",
     "buffer-xor": "^2.0.2",
     "debug": "^4.3.7",
-    "ipaddr.js": "^2.2.0",
     "ip2buf": "^2.0.0",
+    "ipaddr.js": "^2.2.0",
     "is-stun": "^2.0.0",
     "minimist": "^1.2.8",
     "turbo-crc32": "^1.0.1",

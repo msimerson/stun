@@ -1,7 +1,7 @@
 'use strict';
 
-const { test } = require('node:test')
-const assert = require('node:assert/strict')
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
 
 const { attributeType, messageType, attributeValueType } = require('../../src/lib/constants');
 const { createMessage } = require('../../src/lib/create-message');
