@@ -9,6 +9,7 @@
     "prettier": "npx prettier --check .",
     "prettier:fix": "npx prettier --write .",
     "test": "node --test test/index.js test/lib/*.js test/attributes/*.js test/message/*.js test/net/*.js",
+    "test:coverage": "npx -y c8 --reporter=lcov npm test",
     "versions": "npx dependency-version-checker check"
   },
   "bin": "./src/cli.js",
