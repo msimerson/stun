@@ -4,6 +4,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ### Unreleased
 
+### [3.1.2] - 2026-04-07
+- fixes: a handful of bugs
+
 #### Bug Fixes
 
 - stun-error-code-attribute.js — fix errorClass * 100 + code
@@ -93,3 +96,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 [3.0.1]: https://github.com/msimerson/stun/releases/tag/v3.0.1
 [3.0.2]: https://github.com/msimerson/stun/releases/tag/v3.0.2
 [3.2.0]: https://github.com/msimerson/stun/releases/tag/v3.2.0
+[3.1.2]: https://github.com/msimerson/stun/releases/tag/v3.1.2
