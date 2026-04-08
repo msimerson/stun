@@ -1,15 +1,15 @@
-'use strict'
+'use strict';
 
 const {
   encode,
   types: { uint32be },
-} = require('binary-data')
-const constants = require('../lib/constants')
-const StunAttribute = require('./stun-attribute')
+} = require('binary-data');
+const constants = require('../lib/constants');
+const StunAttribute = require('./stun-attribute');
 
-const MAX_UINT32 = -1 >>> 0
+const MAX_UINT32 = -1 >>> 0;
 
-const kValue = Symbol('kValue')
+const kValue = Symbol('kValue');
 
 /**
  * This class implements STUN attribute for UInt32 numbers.
@@ -21,10 +21,10 @@ module.exports = class StunUInt32Attribute extends StunAttribute {
    * @param {number} value
    */
   constructor(type, value) {
-    super(type)
+    super(type);
 
-    this[kValue] = 0
-    this.setValue(value)
+    this[kValue] = 0;
+    this.setValue(value);
   }
 
   /**
@@ -34,14 +34,14 @@ module.exports = class StunUInt32Attribute extends StunAttribute {
    * @returns {StunUInt32Attribute}
    */
   static from(type, message) {
-    return new StunUInt32Attribute(type, message.readUInt32BE(0))
+    return new StunUInt32Attribute(type, message.readUInt32BE(0));
   }
 
   /**
    * Get attribute value.
    */
   get value() {
-    return this[kValue]
+    return this[kValue];
   }
 
   /**
@@ -49,7 +49,7 @@ module.exports = class StunUInt32Attribute extends StunAttribute {
    * @returns {number}
    */
   get valueType() {
-    return constants.attributeValueType.UINT32
+    return constants.attributeValueType.UINT32;
   }
 
   /**
@@ -59,11 +59,11 @@ module.exports = class StunUInt32Attribute extends StunAttribute {
    */
   setValue(value) {
     if (Number.isSafeInteger(value) && value >= 0 && value <= MAX_UINT32) {
-      this[kValue] = value
-      return true
+      this[kValue] = value;
+      return true;
     }
 
-    return false
+    return false;
   }
 
   /**
@@ -72,7 +72,7 @@ module.exports = class StunUInt32Attribute extends StunAttribute {
    * @returns {bool}
    */
   write(encodeStream) {
-    encode(this.value, encodeStream, uint32be)
-    return true
+    encode(this.value, encodeStream, uint32be);
+    return true;
   }
-}
+};

@@ -1,12 +1,12 @@
-'use strict'
+'use strict';
 
-const dgram = require('dgram')
-const StunServer = require('./dgram-server')
+const dgram = require('dgram');
+const StunServer = require('./dgram-server');
 
 module.exports = {
   createServer,
   createDgramServer,
-}
+};
 
 /**
  * Creates a new STUN server.
@@ -19,12 +19,12 @@ function createServer(options = {}) {
   switch (options.type) {
     case 'udp4':
     case 'udp6':
-      return createDgramServer(options)
+      return createDgramServer(options);
     default:
-      break
+      break;
   }
 
-  throw new Error('Invalid server type.')
+  throw new Error('Invalid server type.');
 }
 
 /**
@@ -35,21 +35,21 @@ function createServer(options = {}) {
  * @returns {StunServer}
  */
 function createDgramServer(options = {}) {
-  let isExternalSocket = false
-  let { socket } = options
+  let isExternalSocket = false;
+  let { socket } = options;
 
   if (socket instanceof dgram.Socket) {
-    isExternalSocket = true
+    isExternalSocket = true;
   } else {
-    socket = dgram.createSocket(options)
+    socket = dgram.createSocket(options);
   }
 
-  const server = new StunServer(socket)
+  const server = new StunServer(socket);
 
   if (!isExternalSocket) {
-    socket.on('error', (error) => server.emit('error', error))
-    server.once('close', () => socket.close())
+    socket.on('error', (error) => server.emit('error', error));
+    server.once('close', () => socket.close());
   }
 
-  return server
+  return server;
 }

@@ -57,7 +57,6 @@
   },
   "prettier": {
     "printWidth": 90,
-    "singleQuote": true,
-    "semi": false
+    "singleQuote": true
   }
 }

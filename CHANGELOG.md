@@ -10,9 +10,10 @@ All notable changes to the "stun" package will be documented in this file.
 
 ### [3.1.1] - 2026-04-07
 
-- codeql tidying #12
+- ci: tighten permissions for codeql #12
 - dep(ipaddr.js): bump to 2.3.0
 - doc(CONTRIBUTORS.md): added
+- prettier: formatting
 
 ### [3.1.0] - 2026-04-07
 

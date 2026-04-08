@@ -1,20 +1,20 @@
-'use strict'
+'use strict';
 
-const crypto = require('crypto')
-const defaultConstants = require('./constants')
-const StunRequest = require('../message/request')
+const crypto = require('crypto');
+const defaultConstants = require('./constants');
+const StunRequest = require('../message/request');
 
 module.exports = {
   createTransaction,
   createMessage,
-}
+};
 
 /**
  * Create transaction id for STUN message.
  * @returns {Buffer}
  */
 function createTransaction() {
-  return crypto.randomBytes(defaultConstants.kStunTransactionIdLength)
+  return crypto.randomBytes(defaultConstants.kStunTransactionIdLength);
 }
 
 /**
@@ -24,10 +24,10 @@ function createTransaction() {
  * @returns {StunRequest} StunRequest instance.
  */
 function createMessage(type, transaction) {
-  const message = new StunRequest()
+  const message = new StunRequest();
 
-  message.setType(type)
-  message.setTransactionId(transaction || createTransaction())
+  message.setType(type);
+  message.setTransactionId(transaction || createTransaction());
 
-  return message
+  return message;
 }

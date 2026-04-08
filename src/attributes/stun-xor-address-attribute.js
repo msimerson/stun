@@ -1,17 +1,17 @@
-'use strict'
+'use strict';
 
-const net = require('net')
-const ipa = require('ipaddr.js')
+const net = require('net');
+const ipa = require('ipaddr.js');
 function xor(a, b) {
-  const buf = Buffer.allocUnsafe(Math.max(a.length, b.length))
-  for (let i = 0; i < buf.length; i++) buf[i] = a[i] ^ b[i]
-  return buf
+  const buf = Buffer.allocUnsafe(Math.max(a.length, b.length));
+  for (let i = 0; i < buf.length; i++) buf[i] = a[i] ^ b[i];
+  return buf;
 }
-const { pton4, pton6 } = require('ip2buf')
-const constants = require('../lib/constants')
-const StunAddressAttribute = require('./stun-address-attribute')
+const { pton4, pton6 } = require('ip2buf');
+const constants = require('../lib/constants');
+const StunAddressAttribute = require('./stun-address-attribute');
 
-const kOwner = Symbol('kOwner')
+const kOwner = Symbol('kOwner');
 
 /**
  * This class implements STUN attribute for XORed ip address and port.
@@ -24,9 +24,9 @@ module.exports = class StunXorAddressAttribute extends StunAddressAttribute {
    * @param {number} port
    */
   constructor(type, address, port) {
-    super(type, address, port)
+    super(type, address, port);
 
-    this[kOwner] = null
+    this[kOwner] = null;
   }
 
   /**
@@ -37,15 +37,15 @@ module.exports = class StunXorAddressAttribute extends StunAddressAttribute {
    * @returns {StunAddressAttribute}
    */
   static from(type, message, owner) {
-    const packet = StunAddressAttribute.decode(message)
+    const packet = StunAddressAttribute.decode(message);
 
-    const port = xorPort(packet.port)
-    const address = xorIP(ipa.fromByteArray(packet.address).toString(), owner)
+    const port = xorPort(packet.port);
+    const address = xorIP(ipa.fromByteArray(packet.address).toString(), owner);
 
-    const attribute = new StunXorAddressAttribute(type, address, port)
+    const attribute = new StunXorAddressAttribute(type, address, port);
 
-    attribute.setOwner(owner)
-    return attribute
+    attribute.setOwner(owner);
+    return attribute;
   }
 
   /**
@@ -53,7 +53,7 @@ module.exports = class StunXorAddressAttribute extends StunAddressAttribute {
    * @returns {number}
    */
   get valueType() {
-    return constants.attributeValueType.XOR_ADDRESS
+    return constants.attributeValueType.XOR_ADDRESS;
   }
 
   /**
@@ -61,7 +61,7 @@ module.exports = class StunXorAddressAttribute extends StunAddressAttribute {
    * @param {StunMessage} owner
    */
   setOwner(owner) {
-    this[kOwner] = owner
+    this[kOwner] = owner;
   }
 
   /**
@@ -70,17 +70,17 @@ module.exports = class StunXorAddressAttribute extends StunAddressAttribute {
    * @private
    */
   writeValue() {
-    const packet = this.value
+    const packet = this.value;
 
-    packet.port = xorPort(packet.port)
+    packet.port = xorPort(packet.port);
 
     if (this[kOwner] !== null) {
-      packet.address = xorIP(packet.address, this[kOwner])
+      packet.address = xorIP(packet.address, this[kOwner]);
     }
 
-    return packet
+    return packet;
   }
-}
+};
 
 /**
  * Get XORed port.
@@ -88,7 +88,7 @@ module.exports = class StunXorAddressAttribute extends StunAddressAttribute {
  * @returns {number}
  */
 function xorPort(port) {
-  return port ^ (constants.kStunMagicCookie >> 16)
+  return port ^ (constants.kStunMagicCookie >> 16);
 }
 
 /**
@@ -97,17 +97,17 @@ function xorPort(port) {
  * @returns {string}
  */
 function xorIP(address, owner) {
-  let xored
+  let xored;
 
   if (net.isIPv4(address)) {
-    xored = xorIPv4(pton4(address))
+    xored = xorIPv4(pton4(address));
   } else if (net.isIPv6(address)) {
-    xored = xorIPv6(pton6(address), owner.transactionId)
+    xored = xorIPv6(pton6(address), owner.transactionId);
   } else {
-    throw new Error(`Invalid ip address: ${address}`)
+    throw new Error(`Invalid ip address: ${address}`);
   }
 
-  return ipa.fromByteArray(xored).toString()
+  return ipa.fromByteArray(xored).toString();
 }
 
 /**
@@ -115,7 +115,7 @@ function xorIP(address, owner) {
  * @returns {Buffer}
  */
 function xorIPv4(address) {
-  return xor(address, constants.kStunMagicCookieBuffer)
+  return xor(address, constants.kStunMagicCookieBuffer);
 }
 
 /**
@@ -124,5 +124,5 @@ function xorIPv4(address) {
  * @returns {Buffer}
  */
 function xorIPv6(address, transactionId) {
-  return xor(address, Buffer.concat([constants.kStunMagicCookieBuffer, transactionId]))
+  return xor(address, Buffer.concat([constants.kStunMagicCookieBuffer, transactionId]));
 }

@@ -1,7 +1,7 @@
-'use strict'
+'use strict';
 
-const constants = require('../lib/constants')
-const StunByteStringAttribute = require('./stun-bytestring-attribute')
+const constants = require('../lib/constants');
+const StunByteStringAttribute = require('./stun-bytestring-attribute');
 
 /**
  * This class implements unknown STUN attribute.
@@ -14,7 +14,7 @@ module.exports = class StunUnknownAttribute extends StunByteStringAttribute {
    * @returns {StunUnknownAttribute}
    */
   static from(type, message) {
-    return new StunUnknownAttribute(type, message)
+    return new StunUnknownAttribute(type, message);
   }
 
   /**
@@ -22,7 +22,7 @@ module.exports = class StunUnknownAttribute extends StunByteStringAttribute {
    * @returns {number}
    */
   get valueType() {
-    return constants.attributeValueType.UNKNOWN
+    return constants.attributeValueType.UNKNOWN;
   }
 
   /**
@@ -30,6 +30,6 @@ module.exports = class StunUnknownAttribute extends StunByteStringAttribute {
    * @returns {bool}
    */
   write() {
-    return false
+    return false;
   }
-}
+};

@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
-'use strict'
+'use strict';
 
-const dgram = require('dgram')
-const stun = require('.')
-const { version } = require('../package')
+const dgram = require('dgram');
+const stun = require('.');
+const { version } = require('../package');
 
-const argv = process.argv.slice(2)
-const options = { port: undefined, help: false }
+const argv = process.argv.slice(2);
+const options = { port: undefined, help: false };
 for (let i = 0; i < argv.length; i++) {
-  if (argv[i] === '--port' || argv[i] === '-p') options.port = argv[++i]
-  else if (argv[i] === '--help' || argv[i] === '-h') options.help = true
+  if (argv[i] === '--port' || argv[i] === '-p') options.port = argv[++i];
+  else if (argv[i] === '--help' || argv[i] === '-h') options.help = true;
 }
 
 if (options.help) {
@@ -23,9 +23,9 @@ if (options.help) {
   Options:
     --port, -p      Specified a port on which the STUN server are bound
                     Default port is 3478 defined in RFC5389.
-  `)
+  `);
 
-  process.exit(0)
+  process.exit(0);
 }
 
 /**
@@ -33,39 +33,39 @@ if (options.help) {
  * @param {number} port
  * @returns {boolean}
  */
-const isLegalPort = (port) => Number.isInteger(port) && port > 0 && port <= 0xffff
+const isLegalPort = (port) => Number.isInteger(port) && port > 0 && port <= 0xffff;
 
-const cliPort = Number(options.port)
+const cliPort = Number(options.port);
 
-const socket = dgram.createSocket('udp4')
-const server = stun.createServer(socket)
+const socket = dgram.createSocket('udp4');
+const server = stun.createServer(socket);
 
-const { STUN_BINDING_RESPONSE, STUN_EVENT_BINDING_REQUEST } = stun.constants
-const userAgent = `node/${process.version} stun/v${version}`
+const { STUN_BINDING_RESPONSE, STUN_EVENT_BINDING_REQUEST } = stun.constants;
+const userAgent = `node/${process.version} stun/v${version}`;
 
 server.on(STUN_EVENT_BINDING_REQUEST, (request, rinfo) => {
-  const message = stun.createMessage(STUN_BINDING_RESPONSE)
+  const message = stun.createMessage(STUN_BINDING_RESPONSE);
 
-  message.addXorAddress(rinfo.address, rinfo.port)
-  message.addSoftware(userAgent)
+  message.addXorAddress(rinfo.address, rinfo.port);
+  message.addSoftware(userAgent);
 
-  server.send(message, rinfo.port, rinfo.address)
-})
+  server.send(message, rinfo.port, rinfo.address);
+});
 
 server.on('error', (error) => {
-  process.stderr.write(error.message)
+  process.stderr.write(error.message);
 
   if (error instanceof stun.StunError) {
-    const { address, port } = error.sender
+    const { address, port } = error.sender;
 
-    process.stderr.write(` received from ${address}:${port}`)
+    process.stderr.write(` received from ${address}:${port}`);
   }
 
-  process.stderr.write('\n')
-})
+  process.stderr.write('\n');
+});
 
 socket.bind(isLegalPort(cliPort) ? cliPort : 3478, () => {
-  const { address, port } = socket.address()
+  const { address, port } = socket.address();
 
-  process.stdout.write(`stun server started at ${address}:${port}\n`)
-})
+  process.stdout.write(`stun server started at ${address}:${port}\n`);
+});

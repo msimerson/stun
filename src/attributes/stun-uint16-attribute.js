@@ -1,15 +1,15 @@
-'use strict'
+'use strict';
 
 const {
   encode,
   types: { uint16be },
-} = require('binary-data')
-const constants = require('../lib/constants')
-const StunAttribute = require('./stun-attribute')
+} = require('binary-data');
+const constants = require('../lib/constants');
+const StunAttribute = require('./stun-attribute');
 
-const MAX_UINT16 = 0xffff
+const MAX_UINT16 = 0xffff;
 
-const kValue = Symbol('kValue')
+const kValue = Symbol('kValue');
 
 /**
  * This class implements STUN attribute for uint16 numbers.
@@ -21,10 +21,10 @@ module.exports = class StunUInt16Attribute extends StunAttribute {
    * @param {number} value
    */
   constructor(type, value) {
-    super(type)
+    super(type);
 
-    this[kValue] = 0
-    this.setValue(value)
+    this[kValue] = 0;
+    this.setValue(value);
   }
 
   /**
@@ -34,14 +34,14 @@ module.exports = class StunUInt16Attribute extends StunAttribute {
    * @returns {StunAddressAttribute}
    */
   static from(type, message) {
-    return new StunUInt16Attribute(type, message.readUInt16BE(0))
+    return new StunUInt16Attribute(type, message.readUInt16BE(0));
   }
 
   /**
    * Get attribute value.
    */
   get value() {
-    return this[kValue]
+    return this[kValue];
   }
 
   /**
@@ -49,7 +49,7 @@ module.exports = class StunUInt16Attribute extends StunAttribute {
    * @returns {number}
    */
   get valueType() {
-    return constants.attributeValueType.UINT16
+    return constants.attributeValueType.UINT16;
   }
 
   /**
@@ -59,11 +59,11 @@ module.exports = class StunUInt16Attribute extends StunAttribute {
    */
   setValue(value) {
     if (Number.isSafeInteger(value) && value >= 0 && value <= MAX_UINT16) {
-      this[kValue] = value
-      return true
+      this[kValue] = value;
+      return true;
     }
 
-    return false
+    return false;
   }
 
   /**
@@ -72,7 +72,7 @@ module.exports = class StunUInt16Attribute extends StunAttribute {
    * @returns {bool}
    */
   write(encodeStream) {
-    encode(this.value, encodeStream, uint16be)
-    return true
+    encode(this.value, encodeStream, uint16be);
+    return true;
   }
-}
+};

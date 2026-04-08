@@ -1,11 +1,11 @@
-'use strict'
+'use strict';
 
-const Emitter = require('events')
-const isStun = (msg) => Buffer.isBuffer(msg) && msg.length > 0 && msg[0] <= 3
-const StunRequest = require('../message/request')
-const decode = require('../message/decode')
-const constants = require('../lib/constants')
-const { StunMessageError, StunResponseError } = require('../lib/errors')
+const Emitter = require('events');
+const isStun = (msg) => Buffer.isBuffer(msg) && msg.length > 0 && msg[0] <= 3;
+const StunRequest = require('../message/request');
+const decode = require('../message/decode');
+const constants = require('../lib/constants');
+const { StunMessageError, StunResponseError } = require('../lib/errors');
 
 const {
   eventNames: {
@@ -14,19 +14,19 @@ const {
     EVENT_BINDING_REQUEST,
     EVENT_BINDING_ERROR_RESPONSE,
   },
-} = constants
+} = constants;
 
-const isStunRequest = 0
-const isStunIndication = 0x010
-const isStunSuccessResponse = 0x100
-const isStunErrorResponse = 0x110
+const isStunRequest = 0;
+const isStunIndication = 0x010;
+const isStunSuccessResponse = 0x100;
+const isStunErrorResponse = 0x110;
 
-const kSocket = Symbol('kSocket')
-const kHandleMessage = Symbol('kHandleMessage')
-const kHandleClose = Symbol('kHandleClose')
-const kHandleListening = Symbol('kHandleListening')
-const kClosed = Symbol('kClosed')
-const kOnMessage = Symbol('kOnMessage')
+const kSocket = Symbol('kSocket');
+const kHandleMessage = Symbol('kHandleMessage');
+const kHandleClose = Symbol('kHandleClose');
+const kHandleListening = Symbol('kHandleListening');
+const kClosed = Symbol('kClosed');
+const kOnMessage = Symbol('kOnMessage');
 
 // This class imlplements a STUN server.
 module.exports = class StunServer extends Emitter {
@@ -35,16 +35,16 @@ module.exports = class StunServer extends Emitter {
    * @param {dgram.Socket} socket
    */
   constructor(socket) {
-    super()
+    super();
 
-    this[kSocket] = socket
-    this[kHandleMessage] = this[kOnMessage].bind(this)
-    this[kHandleClose] = this.close.bind(this)
-    this[kHandleListening] = () => this.emit('listening')
+    this[kSocket] = socket;
+    this[kHandleMessage] = this[kOnMessage].bind(this);
+    this[kHandleClose] = this.close.bind(this);
+    this[kHandleListening] = () => this.emit('listening');
 
-    socket.on('message', this[kHandleMessage])
-    socket.once('close', this[kHandleClose])
-    socket.once('listening', this[kHandleListening])
+    socket.on('message', this[kHandleMessage]);
+    socket.once('close', this[kHandleClose]);
+    socket.once('listening', this[kHandleListening]);
   }
 
   /**
@@ -52,7 +52,7 @@ module.exports = class StunServer extends Emitter {
    * @returns {boolean}
    */
   get [kClosed]() {
-    return this[kSocket] === null
+    return this[kSocket] === null;
   }
 
   /**
@@ -61,31 +61,31 @@ module.exports = class StunServer extends Emitter {
    * @param {Object} rinfo
    */
   process(message, rinfo) {
-    let stunMessage
+    let stunMessage;
 
     try {
-      stunMessage = decode(message)
+      stunMessage = decode(message);
     } catch {
-      this.emit('error', new StunMessageError(message, rinfo))
-      return
+      this.emit('error', new StunMessageError(message, rinfo));
+      return;
     }
 
     switch (stunMessage.type & constants.kStunTypeMask) {
       case isStunRequest:
-        this.emit(EVENT_BINDING_REQUEST, stunMessage, rinfo)
-        break
+        this.emit(EVENT_BINDING_REQUEST, stunMessage, rinfo);
+        break;
       case isStunIndication:
-        this.emit(EVENT_BINDING_INDICATION, stunMessage, rinfo)
-        break
+        this.emit(EVENT_BINDING_INDICATION, stunMessage, rinfo);
+        break;
       case isStunSuccessResponse:
-        this.emit(EVENT_BINDING_RESPONSE, stunMessage, rinfo)
-        break
+        this.emit(EVENT_BINDING_RESPONSE, stunMessage, rinfo);
+        break;
       case isStunErrorResponse:
-        this.emit(EVENT_BINDING_ERROR_RESPONSE, stunMessage, rinfo)
-        this.emit('error', new StunResponseError(stunMessage, rinfo))
-        break
+        this.emit(EVENT_BINDING_ERROR_RESPONSE, stunMessage, rinfo);
+        this.emit('error', new StunResponseError(stunMessage, rinfo));
+        break;
       default:
-        break
+        break;
     }
   }
 
@@ -96,10 +96,10 @@ module.exports = class StunServer extends Emitter {
    */
   [kOnMessage](message, rinfo) {
     if (!isStun(message)) {
-      return
+      return;
     }
 
-    this.process(message, rinfo)
+    this.process(message, rinfo);
   }
 
   /**
@@ -110,15 +110,15 @@ module.exports = class StunServer extends Emitter {
    */
   listen(port, address, callback) {
     if (typeof address === 'function') {
-      callback = address
-      address = undefined
+      callback = address;
+      address = undefined;
     }
 
     if (typeof callback === 'function') {
-      this.once('listening', callback)
+      this.once('listening', callback);
     }
 
-    this[kSocket].bind(port, address)
+    this[kSocket].bind(port, address);
   }
 
   /**
@@ -132,15 +132,15 @@ module.exports = class StunServer extends Emitter {
    */
   send(request, port, address, callback) {
     if (this[kClosed]) {
-      return false
+      return false;
     }
 
     if (!(request instanceof StunRequest)) {
-      return false
+      return false;
     }
 
-    this[kSocket].send(request.toBuffer(), port, address, callback)
-    return true
+    this[kSocket].send(request.toBuffer(), port, address, callback);
+    return true;
   }
 
   /**
@@ -148,14 +148,14 @@ module.exports = class StunServer extends Emitter {
    */
   close() {
     if (this[kClosed]) {
-      return
+      return;
     }
 
-    this[kSocket].removeListener('message', this[kHandleMessage])
-    this[kSocket].removeListener('close', this[kHandleClose])
-    this[kSocket].removeListener('listening', this[kHandleListening])
+    this[kSocket].removeListener('message', this[kHandleMessage]);
+    this[kSocket].removeListener('close', this[kHandleClose]);
+    this[kSocket].removeListener('listening', this[kHandleListening]);
 
-    this[kSocket] = null
-    this.emit('close')
+    this[kSocket] = null;
+    this.emit('close');
   }
-}
+};

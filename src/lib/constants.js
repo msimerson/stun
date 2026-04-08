@@ -1,9 +1,9 @@
-'use strict'
+'use strict';
 
 // This file contains various constants of the STUN protocol, as specified
 // in RFC 5389, and its descendants.
 
-const { createMessageType } = require('./util')
+const { createMessageType } = require('./util');
 
 // These are the classes for STUN message types defined in RFC 5389.
 const classType = {
@@ -11,7 +11,7 @@ const classType = {
   INDICATION: 0b01,
   RESPONSE: 0b10,
   ERROR: 0b11,
-}
+};
 
 const methods = {
   BINDING: 0x0001,
@@ -23,7 +23,7 @@ const methods = {
   DATA: 0x007,
   CREATE_PERMISSION: 0x008,
   CHANNEL_BIND: 0x009,
-}
+};
 
 // These are the types of STUN messages defined in RFC 5389.
 const messageType = {
@@ -56,7 +56,7 @@ const messageType = {
   CHANNEL_BIND_REQUEST: createMessageType(methods.CHANNEL_BIND, classType.REQUEST),
   CHANNEL_BIND_RESPONSE: createMessageType(methods.CHANNEL_BIND, classType.RESPONSE),
   CHANNEL_BIND_ERROR_RESPONSE: createMessageType(methods.CHANNEL_BIND, classType.ERROR),
-}
+};
 
 // These are the types of STUN error codes defined in RFC 5389.
 const errorCode = {
@@ -79,10 +79,10 @@ const errorCode = {
   UNSUPPORTED_PROTOCOL: 442,
   ALLOCATION_QUOTA: 486,
   INSUFFICIENT_CAPACITY: 508,
-}
+};
 
-const errorNameReducer = (map, key) => map.set(errorCode[key], key)
-const errorNames = Object.keys(errorCode).reduce(errorNameReducer, new Map())
+const errorNameReducer = (map, key) => map.set(errorCode[key], key);
+const errorNames = Object.keys(errorCode).reduce(errorNameReducer, new Map());
 
 // Strings for the error codes above.
 const errorReason = {
@@ -104,7 +104,7 @@ const errorReason = {
   UNSUPPORTED_PROTOCOL: 'Unsupported Transport Protocol',
   ALLOCATION_QUOTA: 'Allocation Quota Reached',
   INSUFFICIENT_CAPACITY: 'Insufficient Capacity',
-}
+};
 
 /**
  * These are all known STUN attributes, defined in RFC 5389 and elsewhere.
@@ -162,7 +162,7 @@ const attributeType = {
   RESPONSE_PORT: 0x0027,
   RESPONSE_ORIGIN: 0x802b,
   OTHER_ADDRESS: 0x802c,
-}
+};
 
 // These are the types of the values associated with the attributes above.
 // This allows us to perform some basic validation when reading or adding
@@ -177,35 +177,36 @@ const attributeValueType = {
   ERROR_CODE: 5,
   UINT16_LIST: 6,
   UINT16: 7,
-}
+};
 
 const eventNames = {
   EVENT_BINDING_REQUEST: 'bindingRequest',
   EVENT_BINDING_INDICATION: 'bindingIndication',
   EVENT_BINDING_RESPONSE: 'bindingResponse',
   EVENT_BINDING_ERROR_RESPONSE: 'bindingError',
-}
+};
 
-const kStunFingerprintXorValue = 0x5354554e
+const kStunFingerprintXorValue = 0x5354554e;
 
 // Following values correspond to RFC5389.
-const kStunTransactionIdLength = 12
-const kStunMagicCookie = 0x2112a442
-const kStunMagicCookieBuffer = Buffer.from('2112A442', 'hex')
+const kStunTransactionIdLength = 12;
+const kStunMagicCookie = 0x2112a442;
+const kStunMagicCookieBuffer = Buffer.from('2112A442', 'hex');
 
 // Following value corresponds to an earlier version of STUN from
 // RFC3489.
-const kStunLegacyTransactionIdLength = 16
+const kStunLegacyTransactionIdLength = 16;
 
 // STUN Message Integrity HMAC length.
-const kStunMessageIntegritySize = 20
+const kStunMessageIntegritySize = 20;
 
 // The mask used to determine whether a STUN message is a request/response etc.
-const kStunTypeMask = 0x0110
+const kStunTypeMask = 0x0110;
 
-const kStunAttributeHeaderLength = 4
-const kStunFingerprintLength = 8
-const kStunMessageIntegrityLength = kStunAttributeHeaderLength + kStunMessageIntegritySize
+const kStunAttributeHeaderLength = 4;
+const kStunFingerprintLength = 8;
+const kStunMessageIntegrityLength =
+  kStunAttributeHeaderLength + kStunMessageIntegritySize;
 
 module.exports = {
   errorCode,
@@ -233,4 +234,4 @@ module.exports = {
   kStunAttributeHeaderLength,
   kStunFingerprintLength,
   kStunMessageIntegrityLength,
-}
+};
