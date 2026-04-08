@@ -168,7 +168,7 @@ test('add invalid username', () => {
 
   assert.throws(
     () => message.addUsername('stun/1.2.3'.repeat(52)),
-    /Username should be less than 513 bytes/i,
+    /Username must be less than 513 bytes/i,
   );
 
   assert.equal(message.count, 0);
@@ -346,11 +346,11 @@ test('add PRIORITY', () => {
 
   assert.throws(
     () => message.addPriority(1.23),
-    /The argument should be 32-bit integer/i,
+    /The argument should be a 32-bit unsigned integer/i,
   );
   assert.throws(
     () => message.addPriority(Number.MAX_SAFE_INTEGER),
-    /The argument should be 32-bit integer/i,
+    /The argument should be a 32-bit unsigned integer/i,
   );
 });
 

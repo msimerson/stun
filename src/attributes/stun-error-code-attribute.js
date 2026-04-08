@@ -52,7 +52,7 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
 
     const { errorClass, code, reason } = decode(message, schema);
 
-    return new StunErrorCodeAttribute(type, errorClass * (code + 100), reason);
+    return new StunErrorCodeAttribute(type, errorClass * 100 + code, reason);
   }
 
   /**

@@ -2,11 +2,17 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
-# Change Log
-
-All notable changes to the "stun" package will be documented in this file.
-
 ### Unreleased
+
+#### Bug Fixes
+
+- stun-error-code-attribute.js — fix errorClass * 100 + code
+- response.js — fix getFingerprint() and getPriority()
+- validate.js — Buffer.from(...subarray(...)) + timingSafeEqual
+- stun-xor-address-attribute.js — fix xor() with ?? and Buffer.alloc
+- request.js — addPriority uint32 check, addUsername off-by-one, 2 ** retries
+- dgram-server.js — strengthen isStun with magic cookie check
+- decode.js — add length guard
 
 ### [3.1.1] - 2026-04-07
 

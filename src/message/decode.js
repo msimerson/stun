@@ -17,7 +17,14 @@ module.exports = decode;
  * @param {Buffer} message
  * @returns {StunResponse}
  */
+const STUN_MIN_LENGTH = 20;
+const STUN_MAX_LENGTH = 65535;
+
 function decode(message) {
+  if (!Buffer.isBuffer(message) || message.length < STUN_MIN_LENGTH || message.length > STUN_MAX_LENGTH) {
+    throw new RangeError('Invalid STUN message length');
+  }
+
   const packet = binary.decode(message, StunMessagePacket);
 
   const response = new StunResponse();

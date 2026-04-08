@@ -63,7 +63,8 @@ function validateMessageIntegrity(message, password) {
 
   offsetEnd += kStunMessageIntegrityLength;
 
-  const buf = encode(message).slice(0, -offsetEnd);
+  // Copy the slice so we don't mutate the encoded buffer through a shared view.
+  const buf = Buffer.from(encode(message).subarray(0, -offsetEnd));
 
   // Remove length of FINGERPRINT attribute from message size.
   if (isFingerprintExist) {
@@ -74,5 +75,8 @@ function validateMessageIntegrity(message, password) {
   const hmac = crypto.createHmac('sha1', password);
   hmac.update(buf);
 
-  return hmac.digest().equals(messageIntegrityAttribute.value);
+  const computed = hmac.digest();
+  const expected = Buffer.from(messageIntegrityAttribute.value);
+  if (computed.length !== expected.length) return false;
+  return crypto.timingSafeEqual(computed, expected);
 }

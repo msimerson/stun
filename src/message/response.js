@@ -133,11 +133,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {number}
    */
   getFingerprint() {
-    const attribute = getAttribute(this, attributeType.FINGERPRINT);
-
-    if (typeof attribute === 'number') {
-      return attribute.value >>> 0;
-    }
+    return getAttribute(this, attributeType.FINGERPRINT);
   }
 
   /**
@@ -145,11 +141,7 @@ module.exports = class StunResponse extends StunMessage {
    * @returns {number}
    */
   getPriority() {
-    const attribute = getAttribute(this, attributeType.PRIORITY);
-
-    if (typeof attribute === 'number') {
-      return attribute.value >> 0;
-    }
+    return getAttribute(this, attributeType.PRIORITY);
   }
 
   /**
