@@ -65,12 +65,11 @@ module.exports = class StunServer extends Emitter {
 
     try {
       stunMessage = decode(message);
-    } catch (_) {
+    } catch {
       this.emit('error', new StunMessageError(message, rinfo));
       return;
     }
 
-    // eslint-disable-next-line no-bitwise
     switch (stunMessage.type & constants.kStunTypeMask) {
       case isStunRequest:
         this.emit(EVENT_BINDING_REQUEST, stunMessage, rinfo);
@@ -111,8 +110,8 @@ module.exports = class StunServer extends Emitter {
    */
   listen(port, address, callback) {
     if (typeof address === 'function') {
-      callback = address; // eslint-disable-line no-param-reassign
-      address = undefined; // eslint-disable-line no-param-reassign
+      callback = address;
+      address = undefined;
     }
 
     if (typeof callback === 'function') {

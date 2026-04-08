@@ -1,7 +1,10 @@
 'use strict';
 
-const StunAddressAttribute = require('attributes/stun-address-attribute');
-const constants = require('lib/constants');
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+
+const StunAddressAttribute = require('../../src/attributes/stun-address-attribute');
+const constants = require('../../src/lib/constants');
 
 const type = constants.attributeType.MAPPED_ADDRESS;
 
@@ -13,7 +16,7 @@ test('encode', () => {
     0 /* Reserved */, 0x1 /* Family */, 0xf8, 0x24 /* Port */, 0xc0, 0xa8, 1, 2 /* IP */,
   ]);
 
-  expect(buf).toEqual(expectedBuffer);
+  assert.deepEqual(buf, expectedBuffer);
 });
 
 test('decode', () => {
@@ -26,7 +29,7 @@ test('decode', () => {
   const expectedPort = 63524;
   const expectedAddress = '192.168.1.2';
 
-  expect(value.port).toBe(expectedPort);
-  expect(value.address).toBe(expectedAddress);
-  expect(value.family).toBe('IPv4');
+  assert.equal(value.port, expectedPort);
+  assert.equal(value.address, expectedAddress);
+  assert.equal(value.family, 'IPv4');
 });

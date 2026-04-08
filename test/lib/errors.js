@@ -1,8 +1,11 @@
 'use strict';
 
-const { StunMessageError, StunResponseError } = require('lib/errors');
-const { messageType } = require('lib/constants');
-const { createMessage } = require('lib/create-message');
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+
+const { StunMessageError, StunResponseError } = require('../../src/lib/errors');
+const { messageType } = require('../../src/lib/constants');
+const { createMessage } = require('../../src/lib/create-message');
 
 test('should use ERROR-CODE attribute for StunResponseError', () => {
   const message = createMessage();
@@ -12,11 +15,11 @@ test('should use ERROR-CODE attribute for StunResponseError', () => {
 
   const error = new StunResponseError(message, {});
 
-  expect(error.message).toEqual('hello world');
-  expect(error.code).toEqual(300);
-  expect(error.packet).toBe(message);
-  expect(error.name).toEqual('StunResponseError');
-  expect(error.sender).toEqual({});
+  assert.equal(error.message, 'hello world');
+  assert.equal(error.code, 300);
+  assert.equal(error.packet, message);
+  assert.equal(error.name, 'StunResponseError');
+  assert.deepEqual(error.sender, {});
 });
 
 test('should use fallback if ERROR-CODE attribute missed', () => {
@@ -26,19 +29,19 @@ test('should use fallback if ERROR-CODE attribute missed', () => {
 
   const error = new StunResponseError(message, {});
 
-  expect(error.message).toEqual('Unknown error');
-  expect(error.code).toBeUndefined();
-  expect(error.packet).toBe(message);
-  expect(error.name).toEqual('StunResponseError');
-  expect(error.sender).toEqual({});
+  assert.equal(error.message, 'Unknown error');
+  assert.equal(error.code, undefined);
+  assert.equal(error.packet, message);
+  assert.equal(error.name, 'StunResponseError');
+  assert.deepEqual(error.sender, {});
 });
 
 test('StunMessageError', () => {
   const message = Buffer.alloc(0);
   const error = new StunMessageError(message, {});
 
-  expect(error.message).toEqual('Invalid message');
-  expect(error.packet).toBe(message);
-  expect(error.name).toEqual('StunMessageError');
-  expect(error.sender).toEqual({});
+  assert.equal(error.message, 'Invalid message');
+  assert.equal(error.packet, message);
+  assert.equal(error.name, 'StunMessageError');
+  assert.deepEqual(error.sender, {});
 });

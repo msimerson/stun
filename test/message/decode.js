@@ -1,8 +1,11 @@
 'use strict';
 
-const StunResponse = require('message/response');
-const decode = require('message/decode');
-const { messageType } = require('lib/constants');
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+
+const StunResponse = require('../../src/message/response');
+const decode = require('../../src/message/decode');
+const { messageType } = require('../../src/lib/constants');
 
 test('should decode', () => {
   const packet = Buffer.from([
@@ -14,13 +17,13 @@ test('should decode', () => {
 
   const message = decode(packet);
 
-  expect(message).toBeInstanceOf(StunResponse);
-  expect(message.type).toBe(messageType.BINDING_REQUEST);
-  expect(message.transactionId).toEqual(Buffer.from('d00558707bb8cc6a633a9df7', 'hex'));
-  expect(message.count).toBe(1);
+  assert.equal(message instanceof StunResponse, true);
+  assert.equal(message.type, messageType.BINDING_REQUEST);
+  assert.deepEqual(message.transactionId, Buffer.from('d00558707bb8cc6a633a9df7', 'hex'));
+  assert.equal(message.count, 1);
 
   const xorAddress = message.getXorAddress();
-  expect(xorAddress).toEqual({
+  assert.deepEqual(xorAddress, {
     port: 63524,
     family: 'IPv4',
     address: '192.168.1.35',
