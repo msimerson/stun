@@ -710,5 +710,5 @@ See above.
 
 MIT
 
-- 2017–2019 © Dmitry Tsvettsikh (original author, [reklatsmasters/stun](https://github.com/reklatsmasters/stun))
+- 2017–2019 © Dmitry Tsvettsikh (original author, [reklatsmasters/stun](https://github.com/nodertc/stun))
 - 2024–2026 © Matt Simerson (fork maintainer, [msimerson/stun](https://github.com/msimerson/stun))

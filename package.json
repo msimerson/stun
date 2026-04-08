@@ -10,9 +10,14 @@
     "prettier:fix": "npx prettier --write .",
     "test": "node --test test/index.js test/lib/*.js test/attributes/*.js test/message/*.js test/net/*.js",
     "test:coverage": "npx -y c8 --reporter=lcov npm test",
-    "versions": "npx dependency-version-checker check"
+    "versions": "npx npm-dep-mgr check",
+    "format": "npm run prettier:fix && npm run lint:fix",
+    "versions:fix": "npx npm-dep-mgr update"
   },
   "bin": "./src/cli.js",
+  "files": [
+    "src", "examples"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/msimerson/stun.git"
@@ -47,5 +52,10 @@
   },
   "engines": {
     "node": ">=18.0"
+  },
+  "prettier": {
+    "printWidth": 90,
+    "singleQuote": true,
+    "semi": false
   }
 }

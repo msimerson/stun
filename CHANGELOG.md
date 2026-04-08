@@ -9,7 +9,10 @@ All notable changes to the "stun" package will be documented in this file.
 ### Unreleased
 
 ### [3.1.1] - 2026-04-07
-- codeql tidying (#12)
+
+- codeql tidying #12
+- dep(ipaddr.js): bump to 2.3.0
+- doc(CONTRIBUTORS.md): added
 
 ### [3.1.0] - 2026-04-07
 
@@ -68,3 +71,18 @@ All notable changes to the "stun" package will be documented in this file.
 
 [3.1.0]: https://github.com/msimerson/stun/releases/tag/3.1.0
 [3.1.1]: https://github.com/msimerson/stun/releases/tag/v3.1.1
+[2.1.16]: https://github.com/msimerson/stun/releases/tag/2.1.16
+[1.0.0]: https://github.com/msimerson/stun/releases/tag/v1.0.0
+[1.0.1]: https://github.com/msimerson/stun/releases/tag/v1.0.1
+[1.0.2]: https://github.com/msimerson/stun/releases/tag/v1.0.2
+[1.1.0]: https://github.com/msimerson/stun/releases/tag/v1.1.0
+[1.2.0]: https://github.com/msimerson/stun/releases/tag/v1.2.0
+[1.2.1]: https://github.com/msimerson/stun/releases/tag/v1.2.1
+[1.3.0]: https://github.com/msimerson/stun/releases/tag/v1.3.0
+[1.3.1]: https://github.com/msimerson/stun/releases/tag/v1.3.1
+[2.0.0]: https://github.com/msimerson/stun/releases/tag/v2.0.0
+[2.1.0]: https://github.com/msimerson/stun/releases/tag/v2.1.0
+[3.0.0]: https://github.com/msimerson/stun/releases/tag/v3.0.0
+[3.0.1]: https://github.com/msimerson/stun/releases/tag/v3.0.1
+[3.0.2]: https://github.com/msimerson/stun/releases/tag/v3.0.2
+[3.2.0]: https://github.com/msimerson/stun/releases/tag/v3.2.0
