@@ -2,7 +2,7 @@
 
 All notable changes to the "stun" package will be documented in this file.
 
-### NEXT
+### [3.1.0] - 2026-04-07
 
 - dep(debug): → process.env.DEBUG-conditional logger
 - dep(minimist): → manual argv loop
@@ -56,3 +56,4 @@ All notable changes to the "stun" package will be documented in this file.
 - `StunMessage` class was replaced by `StunRequest` and `StunResponse`. They represent outgoing and incoming messages. The main difference is that you cannot change incoming message.
 - Added simple CLI, use `npx stun` or `npx stun -p 3478`.
 - Another incompatible API changes.
+[3.2.0]: https://github.com/msimerson/stun/releases/tag/3.2.0
