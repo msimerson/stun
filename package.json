@@ -1,5 +1,5 @@
 {
-  "name": "stun",
+  "name": "@msimerson/stun",
   "version": "3.1.1",
   "description": "Session Traversal Utilities for NAT (STUN) client and server.",
   "main": "src/index.js",
