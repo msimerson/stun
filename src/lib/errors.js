@@ -2,13 +2,13 @@
 
 const { attributeType } = require('./constants');
 
-const kPacket = Symbol('packet');
-const kSender = Symbol('sender');
-
 /**
  * Base class for STUN errors.
  */
 class StunError extends Error {
+  #packet;
+  #sender;
+
   /**
    * @class StunError
    * @param {string} message Error message.
@@ -19,8 +19,8 @@ class StunError extends Error {
     super(message);
 
     this.name = 'StunError';
-    this[kPacket] = packet;
-    this[kSender] = sender;
+    this.#packet = packet;
+    this.#sender = sender;
   }
 
   /**
@@ -28,7 +28,7 @@ class StunError extends Error {
    * @returns {Buffer|StunMessage|undefined}
    */
   get packet() {
-    return this[kPacket];
+    return this.#packet;
   }
 
   /**
@@ -36,7 +36,7 @@ class StunError extends Error {
    * @returns {Object|undefined}
    */
   get sender() {
-    return this[kSender];
+    return this.#sender;
   }
 }
 
@@ -57,11 +57,11 @@ class StunMessageError extends StunError {
 }
 
 /**
- * Error class to represent an errors in STUN responses.
+ * Error class to represent errors in STUN responses.
  */
 class StunResponseError extends StunError {
   /**
-   * @class StunError
+   * @class StunResponseError
    * @param {StunMessage} packet Arrived data.
    * @param {Object} sender
    */

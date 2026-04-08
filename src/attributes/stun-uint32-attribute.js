@@ -9,12 +9,12 @@ const StunAttribute = require('./stun-attribute');
 
 const MAX_UINT32 = -1 >>> 0;
 
-const kValue = Symbol('kValue');
-
 /**
  * This class implements STUN attribute for UInt32 numbers.
  */
 module.exports = class StunUInt32Attribute extends StunAttribute {
+  #value = 0;
+
   /**
    * @class StunUInt32Attribute
    * @param {number} type Attribute type.
@@ -23,7 +23,6 @@ module.exports = class StunUInt32Attribute extends StunAttribute {
   constructor(type, value) {
     super(type);
 
-    this[kValue] = 0;
     this.setValue(value);
   }
 
@@ -41,7 +40,7 @@ module.exports = class StunUInt32Attribute extends StunAttribute {
    * Get attribute value.
    */
   get value() {
-    return this[kValue];
+    return this.#value;
   }
 
   /**
@@ -59,7 +58,7 @@ module.exports = class StunUInt32Attribute extends StunAttribute {
    */
   setValue(value) {
     if (Number.isSafeInteger(value) && value >= 0 && value <= MAX_UINT32) {
-      this[kValue] = value;
+      this.#value = value;
       return true;
     }
 

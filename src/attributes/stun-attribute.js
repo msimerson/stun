@@ -4,18 +4,18 @@ const { createEncodeStream } = require('binary-data');
 
 const EMPTY_BUFFER = Buffer.alloc(0);
 
-const kAttributeType = Symbol('kAttributeType');
-
 /**
  * This class implements an abstract STUN attribute.
  */
 module.exports = class StunAttribute {
+  #type;
+
   /**
    * @class StunAttribute
    * @param {number} type Attribute type.
    */
   constructor(type) {
-    this[kAttributeType] = type;
+    this.#type = type;
   }
 
   /**
@@ -23,7 +23,7 @@ module.exports = class StunAttribute {
    * @returns {number}
    */
   get type() {
-    return this[kAttributeType];
+    return this.#type;
   }
 
   /**
@@ -65,7 +65,7 @@ module.exports = class StunAttribute {
   }
 
   /**
-   * Converts attribute to the buffer.
+   * Converts attribute to a buffer.
    * @private
    * @returns {Buffer}
    */

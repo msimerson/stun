@@ -4,6 +4,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ### Unreleased
 
+### [3.2.0] - 2026-04-07
+
+RFC Modernization
+
+
+
+JS Modernization
+
+- Private class fields
+  - replaced all `Symbol()`-keyed instance properties with ES2022 private class fields (`#field`) across every class
+  - prefixed accessors for subclass and internal use, plus `_initFromPacket()` for `decode.js`
+  - `StunRequest`: uses `StunMessage` protected accessors vs shared `Symbol.for()`
+- the long-standing `Symbol.for('kTransctionId')` typo (missing 'a') is gone.
+- Modern Array and Buffer APIs
+  - `Array.prototype.toSpliced()` in `removeAttribute()`
+  - `Buffer.subarray()` replaces deprecated `.slice()`
+  - minimum Node.js version bumped to **20.0**
+- Async/Await (`net/request.js`)
+  - `request()` is now a native `async function`
+  - internal retry logic is isolated in `sendWithRetry()`
+  - `try/finally` guarantees internally-created servers are always closed
+  - `2 ** retries` exponentiation replaces the old bit-shift (`<< retries`)
+- test coverage for all fixed bugs:
+  - Error code decode formula (`errorClass * 100 + code`)
+  - `decode()` rejects buffers shorter than 20 bytes or longer than 65535 bytes
+  - `addUsername` 512/513-byte boundary (off-by-one)
+  - `addPriority` rejects negative values; accepts `0xffffffff`
+  - `getFingerprint()` and `getPriority()` return actual values from decoded messages
+  - All callback-style network tests converted to `async`/`await`
+- Modern JS idioms
+  - index — constants export rewritten using `Object.fromEntries & assign` + a small `prefix()` helper, replacing five `Object.keys().forEach()` mutation loops
+  - `util` — removed redundant `!Number.isNaN(m)` from `isNumber()`
+  - `create-message` — `||` → `transaction ?? createTransaction()` (nullish coalescing)
+
+
 ### [3.1.2] - 2026-04-07
 
 - fix(stun-error-code-attribute) — fix errorClass \* 100 + code

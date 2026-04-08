@@ -32,7 +32,7 @@ function validateFingerprint(message) {
     return false;
   }
 
-  const crc32buf = encode(message).slice(0, -kStunFingerprintLength);
+  const crc32buf = encode(message).subarray(0, -kStunFingerprintLength);
   const currentCRC32 = fingerprintAttribute.value;
 
   return toUInt32(crc32(crc32buf) ^ kStunFingerprintXorValue) === currentCRC32;

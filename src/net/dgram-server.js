@@ -6,13 +6,6 @@ const decode = require('../message/decode');
 const constants = require('../lib/constants');
 const { StunMessageError, StunResponseError } = require('../lib/errors');
 
-const STUN_MIN_LENGTH = 20;
-const isStun = (msg) =>
-  Buffer.isBuffer(msg) &&
-  msg.length >= STUN_MIN_LENGTH &&
-  msg[0] <= 3 &&
-  msg.readUInt32BE(4) === constants.kStunMagicCookie;
-
 const {
   eventNames: {
     EVENT_BINDING_RESPONSE,
@@ -27,15 +20,20 @@ const isStunIndication = 0x010;
 const isStunSuccessResponse = 0x100;
 const isStunErrorResponse = 0x110;
 
-const kSocket = Symbol('kSocket');
-const kHandleMessage = Symbol('kHandleMessage');
-const kHandleClose = Symbol('kHandleClose');
-const kHandleListening = Symbol('kHandleListening');
-const kClosed = Symbol('kClosed');
-const kOnMessage = Symbol('kOnMessage');
+const STUN_MIN_LENGTH = 20;
+const isStun = (msg) =>
+  Buffer.isBuffer(msg) &&
+  msg.length >= STUN_MIN_LENGTH &&
+  msg[0] <= 3 &&
+  msg.readUInt32BE(4) === constants.kStunMagicCookie;
 
-// This class imlplements a STUN server.
+// This class implements a STUN server.
 module.exports = class StunServer extends Emitter {
+  #socket;
+  #handleMessage;
+  #handleClose;
+  #handleListening;
+
   /**
    * @class StunServer
    * @param {dgram.Socket} socket
@@ -43,26 +41,22 @@ module.exports = class StunServer extends Emitter {
   constructor(socket) {
     super();
 
-    this[kSocket] = socket;
-    this[kHandleMessage] = this[kOnMessage].bind(this);
-    this[kHandleClose] = this.close.bind(this);
-    this[kHandleListening] = () => this.emit('listening');
+    this.#socket = socket;
+    this.#handleMessage = this.#onMessage.bind(this);
+    this.#handleClose = this.close.bind(this);
+    this.#handleListening = () => this.emit('listening');
 
-    socket.on('message', this[kHandleMessage]);
-    socket.once('close', this[kHandleClose]);
-    socket.once('listening', this[kHandleListening]);
+    socket.on('message', this.#handleMessage);
+    socket.once('close', this.#handleClose);
+    socket.once('listening', this.#handleListening);
+  }
+
+  get #closed() {
+    return this.#socket === null;
   }
 
   /**
-   * @private
-   * @returns {boolean}
-   */
-  get [kClosed]() {
-    return this[kSocket] === null;
-  }
-
-  /**
-   * Handles arrived a STUN message.
+   * Handles arrived STUN messages.
    * @param {Buffer} message
    * @param {Object} rinfo
    */
@@ -96,11 +90,10 @@ module.exports = class StunServer extends Emitter {
   }
 
   /**
-   * @private
    * @param {Buffer} message
    * @param {Object} rinfo
    */
-  [kOnMessage](message, rinfo) {
+  #onMessage(message, rinfo) {
     if (!isStun(message)) {
       return;
     }
@@ -109,7 +102,7 @@ module.exports = class StunServer extends Emitter {
   }
 
   /**
-   * Start listening on `port` and `address` of specified.
+   * Start listening on `port` and optional `address`.
    * @param {number} port
    * @param {string} [address]
    * @param {Function} [callback]
@@ -124,12 +117,11 @@ module.exports = class StunServer extends Emitter {
       this.once('listening', callback);
     }
 
-    this[kSocket].bind(port, address);
+    this.#socket.bind(port, address);
   }
 
   /**
    * Sends the StunMessage message.
-   *
    * @param {StunRequest} request
    * @param {number} port Remote port.
    * @param {string} address Remote address.
@@ -137,7 +129,7 @@ module.exports = class StunServer extends Emitter {
    * @returns {bool}
    */
   send(request, port, address, callback) {
-    if (this[kClosed]) {
+    if (this.#closed) {
       return false;
     }
 
@@ -145,7 +137,7 @@ module.exports = class StunServer extends Emitter {
       return false;
     }
 
-    this[kSocket].send(request.toBuffer(), port, address, callback);
+    this.#socket.send(request.toBuffer(), port, address, callback);
     return true;
   }
 
@@ -153,15 +145,15 @@ module.exports = class StunServer extends Emitter {
    * Close a STUN server.
    */
   close() {
-    if (this[kClosed]) {
+    if (this.#closed) {
       return;
     }
 
-    this[kSocket].removeListener('message', this[kHandleMessage]);
-    this[kSocket].removeListener('close', this[kHandleClose]);
-    this[kSocket].removeListener('listening', this[kHandleListening]);
+    this.#socket.removeListener('message', this.#handleMessage);
+    this.#socket.removeListener('close', this.#handleClose);
+    this.#socket.removeListener('listening', this.#handleListening);
 
-    this[kSocket] = null;
+    this.#socket = null;
     this.emit('close');
   }
 };

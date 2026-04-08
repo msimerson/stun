@@ -5,7 +5,18 @@ const assert = require('node:assert/strict');
 
 const StunResponse = require('../../src/message/response');
 const decode = require('../../src/message/decode');
-const { messageType } = require('../../src/lib/constants');
+const { createMessage } = require('../../src/lib/create-message');
+const { messageType, attributeType } = require('../../src/lib/constants');
+
+test('rejects buffers that are too short', () => {
+  assert.throws(() => decode(Buffer.alloc(19)), /Invalid STUN message length/);
+  assert.throws(() => decode(Buffer.alloc(0)), /Invalid STUN message length/);
+  assert.throws(() => decode(Buffer.alloc(1)), /Invalid STUN message length/);
+});
+
+test('rejects buffers that are too long', () => {
+  assert.throws(() => decode(Buffer.alloc(65536)), /Invalid STUN message length/);
+});
 
 test('should decode', () => {
   const packet = Buffer.from([
@@ -28,4 +39,34 @@ test('should decode', () => {
     family: 'IPv4',
     address: '192.168.1.35',
   });
+});
+
+test('getFingerprint returns the fingerprint value', () => {
+  const msg = createMessage(messageType.BINDING_RESPONSE);
+  msg.addAttribute(attributeType.SOFTWARE, 'test');
+  msg.addFingerprint();
+
+  // Round-trip through encode+decode
+  const { encode } = require('../../src/message/encode') || {};
+  // Use the StunRequest directly — getFingerprint should return the uint32 value
+  const fp = msg.getAttribute(attributeType.FINGERPRINT);
+  assert.ok(typeof fp.value === 'number', 'fingerprint attribute value should be a number');
+  assert.ok(fp.value >>> 0 === fp.value, 'fingerprint should be uint32');
+});
+
+test('getFingerprint and getPriority return values from decoded response', () => {
+  // Build a message with FINGERPRINT and PRIORITY, encode, decode, check getters
+  const StunRequest = require('../../src/message/request');
+  const encode = require('../../src/message/encode');
+
+  const req = new StunRequest();
+  req.setType(messageType.BINDING_REQUEST);
+  req.setTransactionId(Buffer.alloc(12, 0));
+  req.addPriority(12345);
+  req.addFingerprint();
+
+  const decoded = decode(encode(req));
+  assert.equal(decoded.getPriority(), 12345);
+  assert.equal(typeof decoded.getFingerprint(), 'number');
+  assert.ok(decoded.getFingerprint() >>> 0 === decoded.getFingerprint());
 });

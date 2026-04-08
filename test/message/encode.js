@@ -29,13 +29,7 @@ test('should encode request', () => {
 test('should encode response', () => {
   const message = new StunResponse();
 
-  const kMessageType = Symbol.for('kMessageType');
-  const kTransactionId = Symbol.for('kTransctionId');
-  const kAttributes = Symbol.for('kAttributes');
-
-  message[kMessageType] = messageType.BINDING_REQUEST;
-  message[kTransactionId] = Buffer.from('d00558707bb8cc6a633a9df7', 'hex');
-
+  const txId = Buffer.from('d00558707bb8cc6a633a9df7', 'hex');
   const attribute = attributes.create(
     attributeType.XOR_MAPPED_ADDRESS,
     '192.168.1.35',
@@ -43,7 +37,10 @@ test('should encode response', () => {
   );
   attribute.setOwner(message);
 
-  message[kAttributes].push(attribute);
+  message._initFromPacket(
+    { type: messageType.BINDING_REQUEST, transaction: txId, cookie: 0x2112a442 },
+    [attribute],
+  );
 
   const expectedBuffer = Buffer.from([
     0, 0x01 /* Type */, 0, 12 /* Length */, 0x21, 0x12, 0xa4, 0x42 /* Cookie */, 0xd0,

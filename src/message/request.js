@@ -24,11 +24,6 @@ const {
   kStunLegacyTransactionIdLength,
 } = constants;
 
-const kMessageType = Symbol.for('kMessageType');
-const kTransactionId = Symbol.for('kTransctionId');
-const kCookie = Symbol.for('kCookie');
-const kAttributes = Symbol.for('kAttributes');
-
 const EMPTY_MESSAGE_INTEGRITY = Buffer.alloc(kStunMessageIntegritySize, 0);
 
 const toUInt32 = (x) => x >>> 0;
@@ -43,11 +38,11 @@ class StunRequest extends StunMessage {
    * @param {number} type - A message type, see constants.
    */
   setType(type) {
-    this[kMessageType] = Number(type);
+    this._type = Number(type);
   }
 
   /**
-   * Set `transaction` field for cuurent message.
+   * Set `transaction` field for current message.
    * @param {Buffer} transactionId The value of `transaction` field.
    * @returns {boolean} Was the operation successful or not.
    */
@@ -56,7 +51,7 @@ class StunRequest extends StunMessage {
       return false;
     }
 
-    this[kTransactionId] = transactionId;
+    this._transactionId = transactionId;
     return true;
   }
 
@@ -64,58 +59,31 @@ class StunRequest extends StunMessage {
    * Add an attribute for the message.
    * @param {number} type Attribute type.
    * @param {any[]} arguments_ Values of an attribute.
-   * @returns {StunAttribute|undefined} Return `false` if attribute already exist, otherwise return `true`.
+   * @returns {StunAttribute|undefined} Return undefined if attribute already exists.
    */
   addAttribute(type, ...arguments_) {
     const attribute = attributes.create(type, ...arguments_);
     attribute.setOwner(this);
-
-    /** @type {StunAttribute[]} */
-    const attribute_ = this[kAttributes];
 
     // It should be one unique attribute type per message.
     if (this.hasAttribute(type)) {
       return undefined;
     }
 
-    attribute_.push(attribute);
+    this._attributes.push(attribute);
     return attribute;
   }
 
   /**
    * Remove attribute from current message.
    * @param {number} type - Attribute type.
-   * @returns {boolean} The result of an operation.
+   * @returns {StunAttribute|undefined}
    */
   removeAttribute(type) {
-    /** @type {StunAttribute[]} */
-    const attribute_ = this[kAttributes];
-
-    const index = attribute_.findIndex((attribute) => attribute.type === type);
-
-    switch (index) {
-      case -1:
-        return undefined;
-      case 0:
-        return attribute_.shift();
-      case attribute_.length - 1:
-        return attribute_.pop();
-      default:
-        break;
-    }
-
-    const next = new Array(attribute_.length - 1);
-    const attribute = attribute_[index];
-
-    for (let j = 0, offset = 0; j < next.length; ++j) {
-      if (index === j) {
-        offset = 1;
-      }
-
-      next[j] = attribute_[j + offset];
-    }
-
-    this[kAttributes] = next;
+    const index = this._attributes.findIndex((attribute) => attribute.type === type);
+    if (index === -1) return undefined;
+    const attribute = this._attributes[index];
+    this._attributes = this._attributes.toSpliced(index, 1);
     return attribute;
   }
 
@@ -123,7 +91,7 @@ class StunRequest extends StunMessage {
    * Add MAPPED_ADDRESS attribute.
    * @param {string} address IP address.
    * @param {number} port
-   * @returns {boolean}
+   * @returns {StunAttribute|undefined}
    */
   addAddress(address, port) {
     return this.addAttribute(attributeType.MAPPED_ADDRESS, address, port);
@@ -133,7 +101,7 @@ class StunRequest extends StunMessage {
    * Add ALTERNATE-SERVER attribute.
    * @param {string} address IP address.
    * @param {number} port
-   * @returns {boolean}
+   * @returns {StunAttribute|undefined}
    */
   addAlternateServer(address, port) {
     return this.addAttribute(attributeType.ALTERNATE_SERVER, address, port);
@@ -143,7 +111,7 @@ class StunRequest extends StunMessage {
    * Add XOR_MAPPED_ADDRESS attribute.
    * @param {string} address IP address.
    * @param {number} port
-   * @returns {boolean}
+   * @returns {StunAttribute|undefined}
    */
   addXorAddress(address, port) {
     return this.addAttribute(attributeType.XOR_MAPPED_ADDRESS, address, port);
@@ -152,7 +120,7 @@ class StunRequest extends StunMessage {
   /**
    * Add USERNAME attribute.
    * @param {string|Buffer} username
-   * @returns {boolean}
+   * @returns {StunAttribute|undefined}
    */
   addUsername(username) {
     if (username.length >= 513) {
@@ -168,7 +136,7 @@ class StunRequest extends StunMessage {
    * Add ERROR-CODE attribute.
    * @param {number} code
    * @param {string} [reason]
-   * @returns {boolean}
+   * @returns {StunAttribute|undefined}
    */
   addError(code, reason) {
     assertErrorType(this.type);
@@ -189,7 +157,7 @@ class StunRequest extends StunMessage {
       );
     }
 
-    // Set default error reason for standart error codes.
+    // Set default error reason for standard error codes.
     if (!reason && constants.errorNames.has(code)) {
       reason = constants.errorReason[constants.errorNames.get(code)];
     }
@@ -200,7 +168,7 @@ class StunRequest extends StunMessage {
   /**
    * Add REALM attribute.
    * @param {string} realm
-   * @returns {boolean}
+   * @returns {StunAttribute|undefined}
    */
   addRealm(realm) {
     assert128string(realm);
@@ -211,7 +179,7 @@ class StunRequest extends StunMessage {
   /**
    * Add NONCE attribute.
    * @param {string} nonce
-   * @returns {boolean}
+   * @returns {StunAttribute|undefined}
    */
   addNonce(nonce) {
     assert128string(nonce);
@@ -222,7 +190,7 @@ class StunRequest extends StunMessage {
   /**
    * Add SOFTWARE attribute.
    * @param {string} software
-   * @returns {boolean}
+   * @returns {StunAttribute|undefined}
    */
   addSoftware(software) {
     assert128string(software);
@@ -232,8 +200,8 @@ class StunRequest extends StunMessage {
 
   /**
    * Add UNKNOWN-ATTRIBUTES attribute.
-   * @param {number[]} attributes_ List of an unknown attributes.
-   * @returns {boolean}
+   * @param {number[]} attributes_ List of unknown attributes.
+   * @returns {StunAttribute|undefined}
    */
   addUnknownAttributes(attributes_) {
     assertErrorType(this.type);
@@ -262,14 +230,13 @@ class StunRequest extends StunMessage {
     }
 
     const hmac = crypto.createHmac('sha1', key);
-    hmac.update(message.slice(0, -kStunMessageIntegrityLength));
+    hmac.update(message.subarray(0, -kStunMessageIntegrityLength));
 
     return attributeIntegrity.setValue(hmac.digest());
   }
 
   /**
    * Adds a FINGERPRINT attribute that is valid for the current message.
-   *
    * @returns {boolean} The result of an operation.
    */
   addFingerprint() {
@@ -280,7 +247,7 @@ class StunRequest extends StunMessage {
       return false;
     }
 
-    const crc32buf = message.slice(0, -kStunFingerprintLength);
+    const crc32buf = message.subarray(0, -kStunFingerprintLength);
     return attributeFingerprint.setValue(
       toUInt32(crc32(crc32buf) ^ kStunFingerprintXorValue),
     );
@@ -289,7 +256,7 @@ class StunRequest extends StunMessage {
   /**
    * Add PRIORITY attribute.
    * @param {number} priority
-   * @returns {boolean}
+   * @returns {StunAttribute|undefined}
    */
   addPriority(priority) {
     if (!Number.isInteger(priority) || !isUInt32(priority)) {
@@ -301,7 +268,7 @@ class StunRequest extends StunMessage {
 
   /**
    * Add USE-CANDIDATE attribute.
-   * @returns {boolean}
+   * @returns {StunAttribute|undefined}
    */
   addUseCandidate() {
     return this.addAttribute(attributeType.USE_CANDIDATE);
@@ -310,7 +277,7 @@ class StunRequest extends StunMessage {
   /**
    * Add ICE-CONTROLLED attribute.
    * @param {Buffer} tiebreaker
-   * @returns {boolean}
+   * @returns {StunAttribute|undefined}
    */
   addIceControlled(tiebreaker) {
     assertBindingRequest(this.type);
@@ -325,7 +292,7 @@ class StunRequest extends StunMessage {
   /**
    * Add ICE-CONTROLLING attribute.
    * @param {Buffer} tiebreaker
-   * @returns {boolean}
+   * @returns {StunAttribute|undefined}
    */
   addIceControlling(tiebreaker) {
     assertBindingRequest(this.type);
@@ -338,16 +305,12 @@ class StunRequest extends StunMessage {
   }
 
   /**
-   * Convert current message to the Buffer.
-   *
+   * Write current message to an encode stream.
    * @param {Object} encodeStream Output stream from binary-data.
-   * @returns {boolean} The result of an operation.
+   * @returns {boolean}
    */
   write(encodeStream) {
-    /** @type {StunAttribute[]} */
-    const attrmap = this[kAttributes];
-
-    const attributes_ = attrmap.map((attribute) => ({
+    const attributes_ = this._attributes.map((attribute) => ({
       type: attribute.type,
       value: attribute.toBuffer(),
     }));
@@ -359,7 +322,7 @@ class StunRequest extends StunMessage {
           attributes_,
           array(StunAttributePacket, attributes_.length),
         ),
-        cookie: this[kCookie],
+        cookie: this._cookie,
         transaction: this.transactionId,
       },
       attributes: attributes_,
@@ -370,7 +333,7 @@ class StunRequest extends StunMessage {
   }
 
   /**
-   * Convert current message to the Buffer.
+   * Convert current message to a Buffer.
    * @returns {Buffer} Encoded stun message.
    */
   toBuffer() {
@@ -385,9 +348,9 @@ class StunRequest extends StunMessage {
 StunRequest.prototype.setTransactionID = StunRequest.prototype.setTransactionId;
 
 /**
- * Check if tranasction id is valid.
- * @param {Buffer} transactionId - `transction` field from a stun message.
- * @returns {boolean} The result of an operation.
+ * Check if transaction id is valid.
+ * @param {Buffer} transactionId
+ * @returns {boolean}
  */
 function isValidTransactionId(transactionId) {
   return (
@@ -398,7 +361,7 @@ function isValidTransactionId(transactionId) {
 }
 
 /**
- * Check if argument is a 128 characters string.
+ * Check if argument is a string of fewer than 128 characters.
  * @param {any} string
  */
 function assert128string(string) {

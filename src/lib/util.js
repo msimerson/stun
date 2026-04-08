@@ -59,5 +59,5 @@ function createMessageType(method, clas) {
  * @returns {bool}
  */
 function isNumber(m) {
-  return Number.isSafeInteger(m) && !Number.isNaN(m);
+  return Number.isSafeInteger(m); // isSafeInteger already excludes NaN and Infinity
 }

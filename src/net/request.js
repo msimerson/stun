@@ -1,6 +1,5 @@
 'use strict';
 
-const { promisify } = require('util');
 const debug = process.env.DEBUG?.includes('stun')
   ? (...args) => console.error('[stun:request]', ...args)
   : () => {};
@@ -10,18 +9,16 @@ const { messageType, eventNames } = require('../lib/constants');
 const { createServer } = require('../net/create-server');
 const { createMessage } = require('../lib/create-message');
 
-module.exports = {
-  request: promisify(request),
-};
+module.exports = { request };
 
 /**
  * @typedef {Object} RequestOptions
- * @property {StunServer} [server]
- * @property {dgram.Socket} [socket]
- * @property {StunRequest} [message]
- * @property {number} [timeout] Initial RTO.
- * @property {number} [maxTimeout] Maximal RTO.
- * @property {number} [retries] Maximal the number of retries.
+ * @property {StunServer} [server] - Existing StunServer to reuse.
+ * @property {dgram.Socket} [socket] - Existing UDP socket to bind.
+ * @property {StunRequest} [message] - Custom STUN message to send.
+ * @property {number} [timeout] - Initial RTO in ms (default 500).
+ * @property {number} [maxTimeout] - Maximum RTO in ms (default Infinity).
+ * @property {number} [retries] - Maximum retry count (default 6).
  */
 
 const defaultRetryOptions = {
@@ -31,97 +28,41 @@ const defaultRetryOptions = {
 };
 
 /**
- * Send a stun binding request to resolve ip address.
+ * Send a STUN binding request and resolve with the response.
  * @param {string} url
  * @param {RequestOptions} [options]
- * @param {Function} callback
+ * @returns {Promise<StunResponse>}
  */
-function request(url, options = {}, callback) {
-  if (typeof options === 'function') {
-    callback = options;
-    options = {};
-  }
-
-  // if no proto, prepend stun://
+async function request(url, options = {}) {
   const { port, protocol, hostname } = new URL(/:\/\//.test(url) ? url : `stun://${url}`);
 
   if (protocol !== 'stun:') {
-    process.nextTick(callback, new Error(`Invalid protocol '${protocol}'`));
-    return;
+    throw new Error(`Invalid protocol '${protocol}'`);
   }
 
+  const externalServer = options.server instanceof StunServer;
+  const server = externalServer
+    ? options.server
+    : createServer({ type: 'udp4', socket: options.socket });
+
+  const message =
+    options.message instanceof StunRequest
+      ? options.message
+      : createMessage(messageType.BINDING_REQUEST);
+
+  debug(externalServer ? 'use external server' : 'create server');
+  debug(
+    options.message instanceof StunRequest
+      ? 'use external message'
+      : 'create BINDING_REQUEST message',
+  );
   debug('start request to %s:%s', hostname, port || 3478);
 
-  let server;
-  let message;
-  let externalServer = false;
+  const retryOptions = { ...defaultRetryOptions, ...options };
 
-  if (options.server instanceof StunServer) {
-    debug('use external server');
-    server = options.server;
-    externalServer = true;
-  } else {
-    debug('create server');
-    const { socket } = options;
-    server = createServer({ type: 'udp4', socket });
-  }
-
-  if (options.message instanceof StunRequest) {
-    debug('use external message');
-    message = options.message;
-  } else {
-    debug('create BINDING_REQUEST message');
-    message = createMessage(messageType.BINDING_REQUEST);
-  }
-
-  const retrier = () => {
-    debug('send message');
-    server.send(message, port || 3478, hostname);
-  };
-
-  const retryOptions = Object.assign({}, defaultRetryOptions, options);
-  const done = retry(retrier, retryOptions, (error, result) => {
-    cleanup();
-    process.nextTick(callback, error, result);
-  });
-
-  server.on(eventNames.EVENT_BINDING_RESPONSE, onResponse);
-  server.on('error', onError);
-
-  /**
-   * Error handler.
-   * @param {Error} error
-   */
-  function onError(error) {
-    // check stun err for transation
-
-    debug('got stun error %s', error.message);
-    done(error);
-  }
-
-  /**
-   * Handle incoming binding_response messages.
-   * @param {StunResponse} response
-   */
-  function onResponse(response) {
-    debug('got response');
-    if (Buffer.compare(message.transactionId, response.transactionId) !== 0) {
-      debug('invalid transaction id, skip');
-      return;
-    }
-
-    debug('success');
-    done(null, response);
-  }
-
-  /**
-   * Remove request's handlers.
-   */
-  function cleanup() {
-    debug('clean up');
-    server.removeListener('error', onError);
-    server.removeListener(eventNames.EVENT_BINDING_RESPONSE, onResponse);
-
+  try {
+    return await sendWithRetry(server, message, Number(port) || 3478, hostname, retryOptions);
+  } finally {
     if (!externalServer) {
       debug('close server');
       server.close();
@@ -130,37 +71,73 @@ function request(url, options = {}, callback) {
 }
 
 /**
- *
- * @param {Function} fn
+ * Send message with exponential backoff, resolving on first valid response.
+ * @param {StunServer} server
+ * @param {StunRequest} message
+ * @param {number} port
+ * @param {string} hostname
  * @param {Object} options
- * @param {number} options.timeout Initial RTO.
- * @param {number} options.maxTimeout Maximal RTO.
- * @param {number} options.retries Maximal the number of retries.
- * @param {Function} callback
- * @returns {Function}
+ * @returns {Promise<StunResponse>}
+ */
+function sendWithRetry(server, message, port, hostname, options) {
+  return new Promise((resolve, reject) => {
+    const retrier = () => {
+      debug('send message');
+      server.send(message, port, hostname);
+    };
+
+    const done = retry(retrier, options, (error, result) => {
+      cleanup();
+      if (error) reject(error);
+      else resolve(result);
+    });
+
+    server.on(eventNames.EVENT_BINDING_RESPONSE, onResponse);
+    server.on('error', onError);
+
+    function onError(error) {
+      debug('got stun error %s', error.message);
+      done(error);
+    }
+
+    function onResponse(response) {
+      debug('got response');
+      if (Buffer.compare(message.transactionId, response.transactionId) !== 0) {
+        debug('invalid transaction id, skip');
+        return;
+      }
+      debug('success');
+      done(null, response);
+    }
+
+    function cleanup() {
+      debug('clean up');
+      server.removeListener('error', onError);
+      server.removeListener(eventNames.EVENT_BINDING_RESPONSE, onResponse);
+    }
+  });
+}
+
+/**
+ * Exponential backoff retry.
+ * @param {Function} fn - Function to call on each attempt.
+ * @param {Object} options
+ * @param {number} options.timeout - Initial RTO in ms.
+ * @param {number} options.maxTimeout - Maximum RTO in ms.
+ * @param {number} options.retries - Maximum number of retries.
+ * @param {Function} callback - Called with (error, result) when done.
+ * @returns {Function} done — call to cancel and deliver an early result.
  */
 function retry(fn, options, callback) {
   let handle;
   debug('retry options %o', options);
 
-  /**
-   * Clean up.
-   * @param {Error} error
-   * @param {Object} result
-   */
   function done(error, result) {
-    if (handle) {
-      clearTimeout(handle);
-    }
-
+    if (handle) clearTimeout(handle);
     debug('done');
     callback(error, result);
   }
 
-  /**
-   * Runner.
-   * @param {number} count
-   */
   function attempt(count) {
     const next = () => {
       debug('attempt %s', count);
@@ -173,13 +150,12 @@ function retry(fn, options, callback) {
       return;
     }
 
-    const retries = count - 1;
-    const rto = options.timeout * 2 ** retries;
+    const rto = options.timeout * (2 ** (count - 1));
     const timeout = Math.min(rto, options.maxTimeout);
     debug('start timer %s (rto = %s)', timeout, rto);
 
     if (count > options.retries) {
-      debug('max retries %s / %s', retries, options.retries);
+      debug('max retries %s / %s', count - 1, options.retries);
       handle = setTimeout(() => done(new Error('timeout')), timeout);
     } else {
       handle = setTimeout(next, timeout);

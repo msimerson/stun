@@ -174,6 +174,21 @@ test('add invalid username', () => {
   assert.equal(message.count, 0);
 });
 
+test('add username at exactly 513 bytes throws (off-by-one boundary)', () => {
+  const message = new StunRequest();
+  message.setType(messageType.BINDING_RESPONSE);
+
+  // 512 bytes is the max allowed (< 513)
+  assert.doesNotThrow(() => message.addUsername('x'.repeat(512)));
+
+  const message2 = new StunRequest();
+  message2.setType(messageType.BINDING_RESPONSE);
+  assert.throws(
+    () => message2.addUsername('x'.repeat(513)),
+    /Username must be less than 513 bytes/i,
+  );
+});
+
 test('add software', () => {
   const message = new StunRequest();
 
@@ -352,6 +367,17 @@ test('add PRIORITY', () => {
     () => message.addPriority(Number.MAX_SAFE_INTEGER),
     /The argument should be a 32-bit unsigned integer/i,
   );
+  // PRIORITY is uint32, not int32 — negative values must be rejected
+  assert.throws(
+    () => message.addPriority(-1),
+    /The argument should be a 32-bit unsigned integer/i,
+  );
+  // uint32 boundary: 0xffffffff is valid, 0x100000000 is not
+  assert.doesNotThrow(() => {
+    const m = new StunRequest();
+    m.setType(messageType.BINDING_ERROR_RESPONSE);
+    m.addPriority(0xffffffff);
+  });
 });
 
 test('add USE-CANDIDATE', () => {
