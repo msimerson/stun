@@ -4,7 +4,11 @@ const StunRequest = require('./message/request');
 const StunResponse = require('./message/response');
 const StunServer = require('./net/dgram-server');
 const defaultConstants = require('./lib/constants');
-const { validateFingerprint, validateMessageIntegrity } = require('./lib/validate');
+const {
+  validateFingerprint,
+  validateMessageIntegrity,
+  validateMessageIntegritySha256,
+} = require('./lib/validate');
 const { StunError, StunMessageError, StunResponseError } = require('./lib/errors');
 const { request } = require('./net/request');
 const { createServer } = require('./net/create-server');
@@ -21,6 +25,7 @@ module.exports = {
   request,
   validateFingerprint,
   validateMessageIntegrity,
+  validateMessageIntegritySha256,
   encode,
   decode,
   StunRequest,
@@ -43,4 +48,5 @@ Object.assign(
   prefix(defaultConstants.errorReason, 'STUN_REASON_'),
   prefix(defaultConstants.attributeType, 'STUN_ATTR_'),
   prefix(defaultConstants.eventNames, 'STUN_'),
+  prefix(defaultConstants.passwordAlgorithm, 'STUN_PASSWORD_ALGORITHM_'),
 );

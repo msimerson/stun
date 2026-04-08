@@ -162,6 +162,13 @@ const attributeType = {
   RESPONSE_PORT: 0x0027,
   RESPONSE_ORIGIN: 0x802b,
   OTHER_ADDRESS: 0x802c,
+
+  // RFC 8489 attributes (STUN 2020).
+  MESSAGE_INTEGRITY_SHA256: 0x001c,
+  PASSWORD_ALGORITHM: 0x001d,
+  USERHASH: 0x001e,
+  PASSWORD_ALGORITHMS: 0x8002,
+  ALTERNATE_DOMAIN: 0x8003,
 };
 
 // These are the types of the values associated with the attributes above.
@@ -177,6 +184,14 @@ const attributeValueType = {
   ERROR_CODE: 5,
   UINT16_LIST: 6,
   UINT16: 7,
+  PASSWORD_ALGORITHM: 8,
+  PASSWORD_ALGORITHMS: 9,
+};
+
+// RFC 8489 password algorithms.
+const passwordAlgorithm = {
+  MD5: 0x0001,
+  SHA_256: 0x0002,
 };
 
 const eventNames = {
@@ -200,6 +215,9 @@ const kStunLegacyTransactionIdLength = 16;
 // STUN Message Integrity HMAC length.
 const kStunMessageIntegritySize = 20;
 
+// RFC 8489 MESSAGE-INTEGRITY-SHA256 is 32 bytes of HMAC-SHA256.
+const kStunMessageIntegritySha256Size = 32;
+
 // The mask used to determine whether a STUN message is a request/response etc.
 const kStunTypeMask = 0x0110;
 
@@ -207,6 +225,8 @@ const kStunAttributeHeaderLength = 4;
 const kStunFingerprintLength = 8;
 const kStunMessageIntegrityLength =
   kStunAttributeHeaderLength + kStunMessageIntegritySize;
+const kStunMessageIntegritySha256Length =
+  kStunAttributeHeaderLength + kStunMessageIntegritySha256Size;
 
 module.exports = {
   errorCode,
@@ -220,6 +240,7 @@ module.exports = {
   attributeType,
 
   attributeValueType,
+  passwordAlgorithm,
 
   eventNames,
 
@@ -229,9 +250,11 @@ module.exports = {
   kStunMagicCookieBuffer,
   kStunLegacyTransactionIdLength,
   kStunMessageIntegritySize,
+  kStunMessageIntegritySha256Size,
   kStunTypeMask,
 
   kStunAttributeHeaderLength,
   kStunFingerprintLength,
   kStunMessageIntegrityLength,
+  kStunMessageIntegritySha256Length,
 };

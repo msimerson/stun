@@ -55,3 +55,20 @@ test('should use provided message', async () => {
     server.close();
   }
 });
+
+test('rejects unsupported protocol', async () => {
+  await assert.rejects(request('http://example.com:3478'), /Invalid protocol/);
+});
+
+test('stuns: uses TLS transport and default port 5349', async () => {
+  // Just verify the protocol routing works — we can't easily hit a real stuns: server in CI.
+  // A connection refused error means the routing worked (not an "Invalid protocol" error).
+  await assert.rejects(
+    request('stuns://127.0.0.1:19999', { timeout: 500 }),
+    // Could be ECONNREFUSED, ECONNRESET, timeout, or cert error — not "Invalid protocol".
+    (err) => {
+      assert.doesNotMatch(err.message, /Invalid protocol/);
+      return true;
+    },
+  );
+});

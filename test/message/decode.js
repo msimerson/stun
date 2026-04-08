@@ -70,3 +70,84 @@ test('getFingerprint and getPriority return values from decoded response', () =>
   assert.equal(typeof decoded.getFingerprint(), 'number');
   assert.ok(decoded.getFingerprint() >>> 0 === decoded.getFingerprint());
 });
+
+// RFC 8489 response getter round-trips
+
+test('getMessageIntegritySha256 round-trip', () => {
+  const StunRequest = require('../../src/message/request');
+  const encode = require('../../src/message/encode');
+  const key = 'sha256-key';
+
+  const req = new StunRequest();
+  req.setType(messageType.BINDING_RESPONSE);
+  req.addMessageIntegritySha256(key);
+
+  const decoded = decode(encode(req));
+  const hmac = decoded.getMessageIntegritySha256();
+  assert.ok(Buffer.isBuffer(hmac));
+  assert.equal(hmac.length, 32);
+});
+
+test('getUserhash round-trip', () => {
+  const StunRequest = require('../../src/message/request');
+  const encode = require('../../src/message/encode');
+  const crypto = require('crypto');
+
+  const req = new StunRequest();
+  req.setType(messageType.BINDING_REQUEST);
+  req.addUserhash('user', 'realm.example.com');
+
+  const decoded = decode(encode(req));
+  const hash = decoded.getUserhash();
+  assert.ok(Buffer.isBuffer(hash));
+  assert.equal(hash.length, 32);
+
+  const expected = crypto.createHash('sha256').update('user:realm.example.com').digest();
+  assert.deepEqual(hash, expected);
+});
+
+test('getPasswordAlgorithm round-trip', () => {
+  const StunRequest = require('../../src/message/request');
+  const encode = require('../../src/message/encode');
+  const { passwordAlgorithm } = require('../../src/lib/constants');
+
+  const req = new StunRequest();
+  req.setType(messageType.BINDING_REQUEST);
+  req.addPasswordAlgorithm(passwordAlgorithm.SHA_256);
+
+  const decoded = decode(encode(req));
+  const val = decoded.getPasswordAlgorithm();
+  assert.equal(val.algorithm, passwordAlgorithm.SHA_256);
+  assert.equal(val.params.length, 0);
+});
+
+test('getPasswordAlgorithms round-trip', () => {
+  const StunRequest = require('../../src/message/request');
+  const encode = require('../../src/message/encode');
+  const { passwordAlgorithm } = require('../../src/lib/constants');
+
+  const req = new StunRequest();
+  req.setType(messageType.BINDING_REQUEST);
+  req.addPasswordAlgorithms([
+    { algorithm: passwordAlgorithm.MD5 },
+    { algorithm: passwordAlgorithm.SHA_256 },
+  ]);
+
+  const decoded = decode(encode(req));
+  const algos = decoded.getPasswordAlgorithms();
+  assert.equal(algos.length, 2);
+  assert.equal(algos[0].algorithm, passwordAlgorithm.MD5);
+  assert.equal(algos[1].algorithm, passwordAlgorithm.SHA_256);
+});
+
+test('getAlternateDomain round-trip', () => {
+  const StunRequest = require('../../src/message/request');
+  const encode = require('../../src/message/encode');
+
+  const req = new StunRequest();
+  req.setType(messageType.BINDING_RESPONSE);
+  req.addAlternateDomain('stun.example.com');
+
+  const decoded = decode(encode(req));
+  assert.equal(decoded.getAlternateDomain(), 'stun.example.com');
+});

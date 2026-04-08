@@ -6,9 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ### [3.2.0] - 2026-04-07
 
-RFC Modernization
+RFC 8489 (STUN 2020) support:
 
+- New attributes: `MESSAGE_INTEGRITY_SHA256` (0x001C), `PASSWORD_ALGORITHM` (0x001D), `USERHASH` (0x001E), `PASSWORD_ALGORITHMS` (0x8002), `ALTERNATE_DOMAIN` (0x8003)
+- `addMessageIntegritySha256(key)` on `StunRequest`
+- `addUserhash(username, realm)` — sends SHA-256(`username:realm`) instead of plaintext username
+- `addPasswordAlgorithm(algorithm, params?)` — single algorithm selection
+- `addPasswordAlgorithms(algorithms)` — server-side algorithm advertisement
+- `addAlternateDomain(domain)` — FQDN companion to `ALTERNATE_SERVER`
+- Corresponding getters on `StunResponse`: `getMessageIntegritySha256()`, `getUserhash()`, `getPasswordAlgorithm()`, `getPasswordAlgorithms()`, `getAlternateDomain()`
+- `validateMessageIntegritySha256(message, key)` exported from `lib/validate` and from the top-level module
+- `constants.passwordAlgorithm` (`{ MD5: 0x0001, SHA_256: 0x0002 }`) and public constants prefixed `STUN_PASSWORD_ALGORITHM_`
+- Custom codec classes `StunPasswordAlgorithmAttribute` and `StunPasswordAlgorithmsAttribute` with correct per-entry padding for the list format
 
+RFC 7064 (`stuns:` URI scheme) support:
+
+- `request('stuns://host:port')` routes to a new TLS-over-TCP transport (`tls-request`)
+- default port for `stuns:` is 5349 (was previously an error)
+- `rejectUnauthorized` option forwarded to the TLS socket (defaults `true`)
+- `http:` and other non-STUN protocols still throw `Invalid protocol`
 
 JS Modernization
 
@@ -37,7 +53,6 @@ JS Modernization
   - index — constants export rewritten using `Object.fromEntries & assign` + a small `prefix()` helper, replacing five `Object.keys().forEach()` mutation loops
   - `util` — removed redundant `!Number.isNaN(m)` from `isNumber()`
   - `create-message` — `||` → `transaction ?? createTransaction()` (nullish coalescing)
-
 
 ### [3.1.2] - 2026-04-07
 
@@ -127,5 +142,5 @@ JS Modernization
 [3.0.0]: https://github.com/msimerson/stun/releases/tag/v3.0.0
 [3.0.1]: https://github.com/msimerson/stun/releases/tag/v3.0.1
 [3.0.2]: https://github.com/msimerson/stun/releases/tag/v3.0.2
-[3.2.0]: https://github.com/msimerson/stun/releases/tag/v3.2.0
 [3.1.2]: https://github.com/msimerson/stun/releases/tag/v3.1.2
+[3.2.0]: https://github.com/msimerson/stun/releases/tag/v3.2.0

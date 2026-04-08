@@ -8,6 +8,7 @@ const StunRequest = require('../message/request');
 const { messageType, eventNames } = require('../lib/constants');
 const { createServer } = require('../net/create-server');
 const { createMessage } = require('../lib/create-message');
+const { tlsRequest } = require('../net/tls-request');
 
 module.exports = { request };
 
@@ -36,19 +37,26 @@ const defaultRetryOptions = {
 async function request(url, options = {}) {
   const { port, protocol, hostname } = new URL(/:\/\//.test(url) ? url : `stun://${url}`);
 
-  if (protocol !== 'stun:') {
+  if (protocol !== 'stun:' && protocol !== 'stuns:') {
     throw new Error(`Invalid protocol '${protocol}'`);
+  }
+
+  const message =
+    options.message instanceof StunRequest
+      ? options.message
+      : createMessage(messageType.BINDING_REQUEST);
+
+  // stuns: uses TLS-over-TCP (RFC 7064). Default port 5349.
+  if (protocol === 'stuns:') {
+    const tlsPort = Number(port) || 5349;
+    debug('start stuns: request to %s:%s', hostname, tlsPort);
+    return tlsRequest(hostname, tlsPort, message, options);
   }
 
   const externalServer = options.server instanceof StunServer;
   const server = externalServer
     ? options.server
     : createServer({ type: 'udp4', socket: options.socket });
-
-  const message =
-    options.message instanceof StunRequest
-      ? options.message
-      : createMessage(messageType.BINDING_REQUEST);
 
   debug(externalServer ? 'use external server' : 'create server');
   debug(

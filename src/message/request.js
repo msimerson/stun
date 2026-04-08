@@ -19,12 +19,15 @@ const {
   kStunFingerprintXorValue,
   kStunFingerprintLength,
   kStunMessageIntegrityLength,
+  kStunMessageIntegritySha256Length,
+  kStunMessageIntegritySha256Size,
   kStunTransactionIdLength,
   kStunMessageIntegritySize,
   kStunLegacyTransactionIdLength,
 } = constants;
 
 const EMPTY_MESSAGE_INTEGRITY = Buffer.alloc(kStunMessageIntegritySize, 0);
+const EMPTY_MESSAGE_INTEGRITY_SHA256 = Buffer.alloc(kStunMessageIntegritySha256Size, 0);
 
 const toUInt32 = (x) => x >>> 0;
 const isUInt32 = (v) => v >= 0 && v <= 0xffffffff;
@@ -233,6 +236,79 @@ class StunRequest extends StunMessage {
     hmac.update(message.subarray(0, -kStunMessageIntegrityLength));
 
     return attributeIntegrity.setValue(hmac.digest());
+  }
+
+  /**
+   * Adds a MESSAGE-INTEGRITY-SHA256 attribute (RFC 8489).
+   * Must not be used together with MESSAGE-INTEGRITY in the same message.
+   * @param {string|Buffer} key HMAC key.
+   * @returns {boolean} The result of an operation.
+   */
+  addMessageIntegritySha256(key) {
+    if (!key) return false;
+    if (this.hasAttribute(attributeType.MESSAGE_INTEGRITY)) return false;
+
+    const attributeIntegrity = this.addAttribute(
+      attributeType.MESSAGE_INTEGRITY_SHA256,
+      EMPTY_MESSAGE_INTEGRITY_SHA256,
+    );
+    const message = this.toBuffer();
+
+    if (message.length === 0) return false;
+
+    const hmac = crypto.createHmac('sha256', key);
+    hmac.update(message.subarray(0, -kStunMessageIntegritySha256Length));
+    return attributeIntegrity.setValue(hmac.digest());
+  }
+
+  /**
+   * Adds a USERHASH attribute (RFC 8489).
+   * Sends SHA-256(username ":" realm) instead of the plaintext username.
+   * REALM must be present; USERNAME must be omitted.
+   * @param {string} username
+   * @param {string} realm
+   * @returns {StunAttribute|undefined}
+   */
+  addUserhash(username, realm) {
+    if (typeof username !== 'string' || typeof realm !== 'string') {
+      throw new TypeError('username and realm must be strings');
+    }
+    const hash = crypto.createHash('sha256').update(`${username}:${realm}`).digest();
+    return this.addAttribute(attributeType.USERHASH, hash);
+  }
+
+  /**
+   * Adds a PASSWORD-ALGORITHM attribute (RFC 8489).
+   * Tells the server which algorithm the client chose for this exchange.
+   * @param {number} algorithm Algorithm identifier (see constants.passwordAlgorithm).
+   * @param {Buffer} [params] Algorithm parameters (empty for MD5 and SHA-256).
+   * @returns {StunAttribute|undefined}
+   */
+  addPasswordAlgorithm(algorithm, params = Buffer.alloc(0)) {
+    return this.addAttribute(attributeType.PASSWORD_ALGORITHM, algorithm, params);
+  }
+
+  /**
+   * Adds a PASSWORD-ALGORITHMS attribute (RFC 8489).
+   * Used by servers to advertise supported algorithms in 401 responses.
+   * @param {Array<{algorithm: number, params?: Buffer}>} algorithms
+   * @returns {StunAttribute|undefined}
+   */
+  addPasswordAlgorithms(algorithms) {
+    return this.addAttribute(attributeType.PASSWORD_ALGORITHMS, algorithms);
+  }
+
+  /**
+   * Adds an ALTERNATE-DOMAIN attribute (RFC 8489).
+   * Companion to ALTERNATE-SERVER; carries the FQDN of the alternate server.
+   * @param {string} domain FQDN.
+   * @returns {StunAttribute|undefined}
+   */
+  addAlternateDomain(domain) {
+    if (typeof domain !== 'string') {
+      throw new TypeError('domain must be a string');
+    }
+    return this.addAttribute(attributeType.ALTERNATE_DOMAIN, domain);
   }
 
   /**
