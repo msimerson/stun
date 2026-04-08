@@ -6,11 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ### [3.1.2] - 2026-04-07
 
-- fix(stun-error-code-attribute) — fix errorClass * 100 + code
+- fix(stun-error-code-attribute) — fix errorClass \* 100 + code
 - fix(response) — fix getFingerprint() and getPriority()
 - fix(validate) — Buffer.from(...subarray(...)) + timingSafeEqual
 - fix(stun-xor-address-attribute) — fix xor() with ?? and Buffer.alloc
-- fix(request) — addPriority uint32 check, addUsername off-by-one, 2 ** retries
+- fix(request) — addPriority uint32 check, addUsername off-by-one, 2 \*\* retries
 - fix(dgram-server) — strengthen isStun with magic cookie check
 - fix(decode) — add length guard
 

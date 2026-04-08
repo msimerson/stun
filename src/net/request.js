@@ -174,7 +174,7 @@ function retry(fn, options, callback) {
     }
 
     const retries = count - 1;
-    const rto = options.timeout * (2 ** retries);
+    const rto = options.timeout * 2 ** retries;
     const timeout = Math.min(rto, options.maxTimeout);
     debug('start timer %s (rto = %s)', timeout, rto);
 
