@@ -14,22 +14,26 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/setup-node@v3
-      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v6
       - run: npm install
       - run: npm test
 
   publish-npm:
     needs: [build]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     environment: npm
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: true
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v6
         with:
           registry-url: https://registry.npmjs.org/
           scope: '@msimerson'
@@ -47,11 +51,12 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           submodules: true
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v6
         with:
           registry-url: https://npm.pkg.github.com/
           scope: '@msimerson'
