@@ -4,25 +4,52 @@ const constants = require('../lib/constants');
 
 const { kStunTransactionIdLength } = constants;
 
-const kMessageType = Symbol.for('kMessageType');
-const kTransactionId = Symbol.for('kTransctionId');
-const kCookie = Symbol.for('kCookie');
-const kAttributes = Symbol.for('kAttributes');
-
 const EMPTY_TRANSACTION_ID = Buffer.alloc(kStunTransactionIdLength, 0);
 
 /**
  * Base class for a STUN message.
  */
 module.exports = class StunMessage {
+  #type = 0;
+  #transactionId = EMPTY_TRANSACTION_ID;
+  #cookie = constants.kStunMagicCookie;
+  #attributes = [];
+
+  // Protected accessors for StunRequest (subclass) and package internals
+  // (decode.js, encode.js). Not part of the public API.
+  get _type() {
+    return this.#type;
+  }
+  set _type(v) {
+    this.#type = v;
+  }
+  get _transactionId() {
+    return this.#transactionId;
+  }
+  set _transactionId(v) {
+    this.#transactionId = v;
+  }
+  get _cookie() {
+    return this.#cookie;
+  }
+  get _attributes() {
+    return this.#attributes;
+  }
+  set _attributes(v) {
+    this.#attributes = v;
+  }
+
   /**
-   * @class StunMessage
+   * Populate fields from a decoded packet header and parsed attribute list.
+   * Used by decode.js — not part of the public API.
+   * @param {Object} header
+   * @param {StunAttribute[]} parsedAttributes
    */
-  constructor() {
-    this[kMessageType] = 0;
-    this[kTransactionId] = EMPTY_TRANSACTION_ID;
-    this[kCookie] = constants.kStunMagicCookie;
-    this[kAttributes] = [];
+  _initFromPacket(header, parsedAttributes) {
+    this.#type = header.type;
+    this.#transactionId = header.transaction;
+    this.#cookie = header.cookie;
+    this.#attributes = parsedAttributes;
   }
 
   /**
@@ -30,7 +57,7 @@ module.exports = class StunMessage {
    * @returns {number}
    */
   get type() {
-    return this[kMessageType];
+    return this.#type;
   }
 
   /**
@@ -38,7 +65,7 @@ module.exports = class StunMessage {
    * @returns {Buffer}
    */
   get transactionId() {
-    return this[kTransactionId];
+    return this.#transactionId;
   }
 
   /**
@@ -46,7 +73,7 @@ module.exports = class StunMessage {
    * @returns {boolean} The result of an operation.
    */
   isLegacy() {
-    return this[kCookie] !== constants.kStunMagicCookie;
+    return this.#cookie !== constants.kStunMagicCookie;
   }
 
   /**
@@ -54,10 +81,7 @@ module.exports = class StunMessage {
    * @returns {number} The number of an attributes in the message.
    */
   get count() {
-    /** @type {StunAttribute[]} */
-    const attribute = this[kAttributes];
-
-    return attribute.length;
+    return this.#attributes.length;
   }
 
   /**
@@ -66,10 +90,7 @@ module.exports = class StunMessage {
    * @returns {StunAttribute|undefined} Instance of StunAttribute or undefined attribute doesn't exist.
    */
   getAttribute(type) {
-    /** @type {StunAttribute[]} */
-    const attributes = this[kAttributes];
-
-    return attributes.find((attribute) => attribute.type === type);
+    return this.#attributes.find((attribute) => attribute.type === type);
   }
 
   /**
@@ -85,7 +106,7 @@ module.exports = class StunMessage {
    * Iterator over attributes.
    */
   *[Symbol.iterator]() {
-    for (const attribute of this[kAttributes]) {
+    for (const attribute of this.#attributes) {
       yield attribute;
     }
   }

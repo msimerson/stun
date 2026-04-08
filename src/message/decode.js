@@ -5,21 +5,16 @@ const StunResponse = require('./response');
 const { StunMessagePacket } = require('../lib/protocol');
 const attributes = require('../lib/attributes');
 
-const kMessageType = Symbol.for('kMessageType');
-const kTransactionId = Symbol.for('kTransctionId');
-const kCookie = Symbol.for('kCookie');
-const kAttributes = Symbol.for('kAttributes');
-
 module.exports = decode;
+
+const STUN_MIN_LENGTH = 20;
+const STUN_MAX_LENGTH = 65535;
 
 /**
  * Decode the Buffer into the StunResponse.
  * @param {Buffer} message
  * @returns {StunResponse}
  */
-const STUN_MIN_LENGTH = 20;
-const STUN_MAX_LENGTH = 65535;
-
 function decode(message) {
   if (
     !Buffer.isBuffer(message) ||
@@ -33,12 +28,9 @@ function decode(message) {
 
   const response = new StunResponse();
 
-  response[kMessageType] = packet.header.type;
-  response[kTransactionId] = packet.header.transaction;
-  response[kCookie] = packet.header.cookie;
-
-  response[kAttributes] = packet.attributes.map((attribute) =>
-    attributes.parse(attribute, response),
+  response._initFromPacket(
+    packet.header,
+    packet.attributes.map((attribute) => attributes.parse(attribute, response)),
   );
 
   return response;

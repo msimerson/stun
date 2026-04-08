@@ -2,21 +2,16 @@
 
 const net = require('net');
 const ipa = require('ipaddr.js');
-function xor(a, b) {
-  const buf = Buffer.alloc(Math.max(a.length, b.length), 0);
-  for (let i = 0; i < buf.length; i++) buf[i] = (a[i] ?? 0) ^ (b[i] ?? 0);
-  return buf;
-}
 const { pton4, pton6 } = require('ip2buf');
 const constants = require('../lib/constants');
 const StunAddressAttribute = require('./stun-address-attribute');
-
-const kOwner = Symbol('kOwner');
 
 /**
  * This class implements STUN attribute for XORed ip address and port.
  */
 module.exports = class StunXorAddressAttribute extends StunAddressAttribute {
+  #owner = null;
+
   /**
    * @class StunXorAddressAttribute
    * @param {number} type Attribute type.
@@ -25,16 +20,14 @@ module.exports = class StunXorAddressAttribute extends StunAddressAttribute {
    */
   constructor(type, address, port) {
     super(type, address, port);
-
-    this[kOwner] = null;
   }
 
   /**
-   * Create `StunAddressAttribute` instance from buffer.
+   * Create `StunXorAddressAttribute` instance from buffer.
    * @param {number} type
    * @param {Buffer} message
    * @param {StunMessage} owner
-   * @returns {StunAddressAttribute}
+   * @returns {StunXorAddressAttribute}
    */
   static from(type, message, owner) {
     const packet = StunAddressAttribute.decode(message);
@@ -61,7 +54,7 @@ module.exports = class StunXorAddressAttribute extends StunAddressAttribute {
    * @param {StunMessage} owner
    */
   setOwner(owner) {
-    this[kOwner] = owner;
+    this.#owner = owner;
   }
 
   /**
@@ -74,13 +67,25 @@ module.exports = class StunXorAddressAttribute extends StunAddressAttribute {
 
     packet.port = xorPort(packet.port);
 
-    if (this[kOwner] !== null) {
-      packet.address = xorIP(packet.address, this[kOwner]);
+    if (this.#owner !== null) {
+      packet.address = xorIP(packet.address, this.#owner);
     }
 
     return packet;
   }
 };
+
+/**
+ * XOR two buffers, zero-padding the shorter one.
+ * @param {Buffer} a
+ * @param {Buffer} b
+ * @returns {Buffer}
+ */
+function xor(a, b) {
+  const buf = Buffer.alloc(Math.max(a.length, b.length), 0);
+  for (let i = 0; i < buf.length; i++) buf[i] = (a[i] ?? 0) ^ (b[i] ?? 0);
+  return buf;
+}
 
 /**
  * Get XORed port.
@@ -100,29 +105,15 @@ function xorIP(address, owner) {
   let xored;
 
   if (net.isIPv4(address)) {
-    xored = xorIPv4(pton4(address));
+    xored = xor(pton4(address), constants.kStunMagicCookieBuffer);
   } else if (net.isIPv6(address)) {
-    xored = xorIPv6(pton6(address), owner.transactionId);
+    xored = xor(
+      pton6(address),
+      Buffer.concat([constants.kStunMagicCookieBuffer, owner.transactionId]),
+    );
   } else {
     throw new Error(`Invalid ip address: ${address}`);
   }
 
   return ipa.fromByteArray(xored).toString();
-}
-
-/**
- * @param {Buffer} address
- * @returns {Buffer}
- */
-function xorIPv4(address) {
-  return xor(address, constants.kStunMagicCookieBuffer);
-}
-
-/**
- * @param {Buffer} address
- * @param {Buffer} transactionId
- * @returns {Buffer}
- */
-function xorIPv6(address, transactionId) {
-  return xor(address, Buffer.concat([constants.kStunMagicCookieBuffer, transactionId]));
 }

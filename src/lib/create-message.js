@@ -27,7 +27,7 @@ function createMessage(type, transaction) {
   const message = new StunRequest();
 
   message.setType(type);
-  message.setTransactionId(transaction || createTransaction());
+  message.setTransactionId(transaction ?? createTransaction());
 
   return message;
 }

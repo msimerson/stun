@@ -174,6 +174,21 @@ test('add invalid username', () => {
   assert.equal(message.count, 0);
 });
 
+test('add username at exactly 513 bytes throws (off-by-one boundary)', () => {
+  const message = new StunRequest();
+  message.setType(messageType.BINDING_RESPONSE);
+
+  // 512 bytes is the max allowed (< 513)
+  assert.doesNotThrow(() => message.addUsername('x'.repeat(512)));
+
+  const message2 = new StunRequest();
+  message2.setType(messageType.BINDING_RESPONSE);
+  assert.throws(
+    () => message2.addUsername('x'.repeat(513)),
+    /Username must be less than 513 bytes/i,
+  );
+});
+
 test('add software', () => {
   const message = new StunRequest();
 
@@ -352,6 +367,17 @@ test('add PRIORITY', () => {
     () => message.addPriority(Number.MAX_SAFE_INTEGER),
     /The argument should be a 32-bit unsigned integer/i,
   );
+  // PRIORITY is uint32, not int32 — negative values must be rejected
+  assert.throws(
+    () => message.addPriority(-1),
+    /The argument should be a 32-bit unsigned integer/i,
+  );
+  // uint32 boundary: 0xffffffff is valid, 0x100000000 is not
+  assert.doesNotThrow(() => {
+    const m = new StunRequest();
+    m.setType(messageType.BINDING_ERROR_RESPONSE);
+    m.addPriority(0xffffffff);
+  });
 });
 
 test('add USE-CANDIDATE', () => {
@@ -422,4 +448,95 @@ test('add ICE-CONTROLLING', () => {
     () => message.addIceControlling(tiebreaker),
     /should present in a Binding request/i,
   );
+});
+
+// RFC 8489 attribute methods
+
+test('addMessageIntegritySha256', () => {
+  const key = 'test-sha256-key';
+  const message = new StunRequest();
+  message.setType(constants.messageType.BINDING_RESPONSE);
+
+  assert.equal(message.addMessageIntegritySha256(key), true);
+  assert.equal(message.hasAttribute(attributeType.MESSAGE_INTEGRITY_SHA256), true);
+  // SHA-256 HMAC is 32 bytes.
+  assert.equal(
+    message.getAttribute(attributeType.MESSAGE_INTEGRITY_SHA256).value.length,
+    32,
+  );
+});
+
+test('addMessageIntegritySha256: returns false with no key', () => {
+  const message = new StunRequest();
+  message.setType(constants.messageType.BINDING_RESPONSE);
+  assert.equal(message.addMessageIntegritySha256(''), false);
+  assert.equal(message.addMessageIntegritySha256(null), false);
+});
+
+test('addMessageIntegritySha256: cannot coexist with MESSAGE-INTEGRITY', () => {
+  const message = new StunRequest();
+  message.setType(constants.messageType.BINDING_RESPONSE);
+  message.addMessageIntegrity('key');
+  assert.equal(message.addMessageIntegritySha256('key'), false);
+});
+
+test('addUserhash', () => {
+  const message = new StunRequest();
+  message.setType(constants.messageType.BINDING_REQUEST);
+
+  const attr = message.addUserhash('user', 'example.com');
+  assert.ok(attr);
+  assert.equal(attr.type, attributeType.USERHASH);
+  // SHA-256 produces 32 bytes.
+  assert.equal(attr.value.length, 32);
+});
+
+test('addUserhash: throws on non-string args', () => {
+  const message = new StunRequest();
+  message.setType(constants.messageType.BINDING_REQUEST);
+  assert.throws(() => message.addUserhash(42, 'realm'), TypeError);
+  assert.throws(() => message.addUserhash('user', null), TypeError);
+});
+
+test('addPasswordAlgorithm', () => {
+  const { passwordAlgorithm } = constants;
+  const message = new StunRequest();
+  message.setType(constants.messageType.BINDING_REQUEST);
+
+  const attr = message.addPasswordAlgorithm(passwordAlgorithm.SHA_256);
+  assert.ok(attr);
+  assert.equal(attr.type, attributeType.PASSWORD_ALGORITHM);
+  assert.equal(attr.value.algorithm, passwordAlgorithm.SHA_256);
+  assert.equal(attr.value.params.length, 0);
+});
+
+test('addPasswordAlgorithms', () => {
+  const { passwordAlgorithm } = constants;
+  const message = new StunRequest();
+  message.setType(constants.messageType.BINDING_REQUEST);
+
+  const algorithms = [
+    { algorithm: passwordAlgorithm.MD5 },
+    { algorithm: passwordAlgorithm.SHA_256 },
+  ];
+  const attr = message.addPasswordAlgorithms(algorithms);
+  assert.ok(attr);
+  assert.equal(attr.type, attributeType.PASSWORD_ALGORITHMS);
+  assert.equal(attr.value.length, 2);
+});
+
+test('addAlternateDomain', () => {
+  const message = new StunRequest();
+  message.setType(constants.messageType.BINDING_RESPONSE);
+
+  const attr = message.addAlternateDomain('stun.example.com');
+  assert.ok(attr);
+  assert.equal(attr.type, attributeType.ALTERNATE_DOMAIN);
+  assert.equal(attr.value.toString(), 'stun.example.com');
+});
+
+test('addAlternateDomain: throws on non-string', () => {
+  const message = new StunRequest();
+  message.setType(constants.messageType.BINDING_RESPONSE);
+  assert.throws(() => message.addAlternateDomain(42), TypeError);
 });

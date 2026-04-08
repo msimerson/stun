@@ -7,12 +7,12 @@ const {
 const constants = require('../lib/constants');
 const StunAttribute = require('./stun-attribute');
 
-const kValue = Symbol('kValue');
-
 /**
  * This class implements STUN attribute for strings and buffers.
  */
 module.exports = class StunByteStringAttribute extends StunAttribute {
+  #value = null;
+
   /**
    * @class StunByteStringAttribute
    * @param {number} type Attribute type.
@@ -22,7 +22,6 @@ module.exports = class StunByteStringAttribute extends StunAttribute {
   constructor(type, value, encoding = 'utf8') {
     super(type);
 
-    this[kValue] = null;
     this.setValue(value, encoding);
   }
 
@@ -40,7 +39,7 @@ module.exports = class StunByteStringAttribute extends StunAttribute {
    * Get attribute value.
    */
   get value() {
-    return this[kValue];
+    return this.#value;
   }
 
   /**
@@ -59,12 +58,12 @@ module.exports = class StunByteStringAttribute extends StunAttribute {
    */
   setValue(value, encoding = 'utf8') {
     if (Buffer.isBuffer(value)) {
-      this[kValue] = value;
+      this.#value = value;
       return true;
     }
 
     if (typeof value === 'string') {
-      this[kValue] = Buffer.from(value, encoding);
+      this.#value = Buffer.from(value, encoding);
       return true;
     }
 

@@ -8,9 +8,9 @@ const {
 const constants = require('../lib/constants');
 const StunAttribute = require('./stun-attribute');
 
-const kAttributeTypes = Symbol('kAttributeTypes');
-
 module.exports = class StunUInt16ListAttribute extends StunAttribute {
+  #types;
+
   /**
    * @class StunUInt16ListAttribute
    * @param {number} type Attribute type.
@@ -19,7 +19,7 @@ module.exports = class StunUInt16ListAttribute extends StunAttribute {
   constructor(type, values) {
     super(type);
 
-    this[kAttributeTypes] = new Set(values);
+    this.#types = new Set(values);
   }
 
   /**
@@ -42,7 +42,7 @@ module.exports = class StunUInt16ListAttribute extends StunAttribute {
    * Get the number of values in the list.
    */
   get length() {
-    return this[kAttributeTypes].size;
+    return this.#types.size;
   }
 
   /**
@@ -50,7 +50,7 @@ module.exports = class StunUInt16ListAttribute extends StunAttribute {
    * @returns {number[]}
    */
   get value() {
-    return [...this[kAttributeTypes]];
+    return [...this.#types];
   }
 
   /**
@@ -71,7 +71,7 @@ module.exports = class StunUInt16ListAttribute extends StunAttribute {
       return false;
     }
 
-    this[kAttributeTypes].add(type);
+    this.#types.add(type);
     return true;
   }
 

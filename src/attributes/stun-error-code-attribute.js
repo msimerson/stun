@@ -8,13 +8,13 @@ const {
 const constants = require('../lib/constants');
 const StunAttribute = require('./stun-attribute');
 
-const kErrorCode = Symbol('kErrorCode');
-const kErrorReason = Symbol('kErrorReason');
-
 /**
  * This class implements STUN attribute for errors.
  */
 module.exports = class StunErrorCodeAttribute extends StunAttribute {
+  #errorCode = 0;
+  #errorReason = '';
+
   /**
    * @class {StunErrorCodeAttribute}
    * @param {number} type Attribute type.
@@ -24,15 +24,12 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
   constructor(type, code, reason) {
     super(type);
 
-    this[kErrorCode] = 0;
-    this[kErrorReason] = '';
-
     if (Number.isInteger(code)) {
-      this[kErrorCode] = code;
+      this.#errorCode = code;
     }
 
     if (typeof reason === 'string' && reason.length < 128) {
-      this[kErrorReason] = reason;
+      this.#errorReason = reason;
     }
   }
 
@@ -70,7 +67,7 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
    * @returns {number}
    */
   get code() {
-    return this[kErrorCode];
+    return this.#errorCode;
   }
 
   /**
@@ -78,7 +75,7 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
    * @returns {string}
    */
   get reason() {
-    return this[kErrorReason];
+    return this.#errorReason;
   }
 
   /**
@@ -86,7 +83,7 @@ module.exports = class StunErrorCodeAttribute extends StunAttribute {
    * @returns {number}
    */
   get errorClass() {
-    return parseInt(this.code / 1e2, 10);
+    return Math.trunc(this.code / 100);
   }
 
   /**

@@ -1,7 +1,6 @@
 'use strict';
 
 const net = require('net');
-const assert = require('assert');
 const {
   encode,
   decode,
@@ -25,14 +24,14 @@ const AddressPacket = {
   address: buffer(({ node }) => (node.family === STUN_ADDRESS_4 ? 4 : 16)),
 };
 
-const kPort = Symbol('kPort');
-const kAddress = Symbol('kAddress');
-const kFamily = Symbol('kFamily');
-
 /**
  * This class implements STUN attribute for ip/port pair.
  */
 module.exports = class StunAddressAttribute extends StunAttribute {
+  #port = 0;
+  #address = null;
+  #family = null;
+
   /**
    * @class StunAddressAttribute
    * @param {number} type Attribute type.
@@ -41,10 +40,6 @@ module.exports = class StunAddressAttribute extends StunAttribute {
    */
   constructor(type, address, port) {
     super(type);
-
-    this[kPort] = 0;
-    this[kAddress] = null;
-    this[kFamily] = null;
 
     this.setPort(port);
     this.setAddress(address);
@@ -61,8 +56,8 @@ module.exports = class StunAddressAttribute extends StunAttribute {
 
     const ipaddr = ipa.fromByteArray(address).toString();
 
-    assert(isPort(port));
-    assert(net.isIP(ipaddr));
+    if (!isPort(port)) throw new RangeError(`Invalid port: ${port}`);
+    if (!net.isIP(ipaddr)) throw new TypeError(`Invalid IP address: ${ipaddr}`);
 
     return new StunAddressAttribute(type, ipaddr, port);
   }
@@ -90,9 +85,9 @@ module.exports = class StunAddressAttribute extends StunAttribute {
    */
   get value() {
     return {
-      port: this[kPort],
-      family: this[kFamily],
-      address: this[kAddress],
+      port: this.#port,
+      family: this.#family,
+      address: this.#address,
     };
   }
 
@@ -103,7 +98,7 @@ module.exports = class StunAddressAttribute extends StunAttribute {
    */
   setPort(port) {
     if (isPort(port)) {
-      this[kPort] = port;
+      this.#port = port;
       return true;
     }
 
@@ -117,8 +112,8 @@ module.exports = class StunAddressAttribute extends StunAttribute {
    */
   setAddress(address) {
     if (net.isIP(address)) {
-      this[kAddress] = address;
-      this[kFamily] = net.isIPv4(address) ? FAMILY_4 : FAMILY_6;
+      this.#address = address;
+      this.#family = net.isIPv4(address) ? FAMILY_4 : FAMILY_6;
 
       return true;
     }

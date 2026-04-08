@@ -159,4 +159,44 @@ module.exports = class StunResponse extends StunMessage {
   getIceControlling() {
     return getAttribute(this, attributeType.ICE_CONTROLLING);
   }
+
+  /**
+   * Get MESSAGE_INTEGRITY_SHA256 attribute (RFC 8489).
+   * @returns {Buffer}
+   */
+  getMessageIntegritySha256() {
+    return getAttribute(this, attributeType.MESSAGE_INTEGRITY_SHA256);
+  }
+
+  /**
+   * Get USERHASH attribute (RFC 8489).
+   * @returns {Buffer} 32-byte SHA-256 hash of "username:realm".
+   */
+  getUserhash() {
+    return getAttribute(this, attributeType.USERHASH);
+  }
+
+  /**
+   * Get PASSWORD_ALGORITHM attribute (RFC 8489).
+   * @returns {{ algorithm: number, params: Buffer }|undefined}
+   */
+  getPasswordAlgorithm() {
+    return getAttribute(this, attributeType.PASSWORD_ALGORITHM);
+  }
+
+  /**
+   * Get PASSWORD_ALGORITHMS attribute (RFC 8489).
+   * @returns {Array<{algorithm: number, params: Buffer}>|undefined}
+   */
+  getPasswordAlgorithms() {
+    return getAttribute(this, attributeType.PASSWORD_ALGORITHMS);
+  }
+
+  /**
+   * Get ALTERNATE_DOMAIN attribute (RFC 8489).
+   * @returns {string|undefined}
+   */
+  getAlternateDomain() {
+    return getStringAttribute(this, attributeType.ALTERNATE_DOMAIN);
+  }
 };

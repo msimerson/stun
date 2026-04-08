@@ -4,7 +4,11 @@ const StunRequest = require('./message/request');
 const StunResponse = require('./message/response');
 const StunServer = require('./net/dgram-server');
 const defaultConstants = require('./lib/constants');
-const { validateFingerprint, validateMessageIntegrity } = require('./lib/validate');
+const {
+  validateFingerprint,
+  validateMessageIntegrity,
+  validateMessageIntegritySha256,
+} = require('./lib/validate');
 const { StunError, StunMessageError, StunResponseError } = require('./lib/errors');
 const { request } = require('./net/request');
 const { createServer } = require('./net/create-server');
@@ -21,6 +25,7 @@ module.exports = {
   request,
   validateFingerprint,
   validateMessageIntegrity,
+  validateMessageIntegritySha256,
   encode,
   decode,
   StunRequest,
@@ -32,23 +37,16 @@ module.exports = {
   constants,
 };
 
-// Export constants
-Object.keys(defaultConstants.messageType).forEach((messageType) => {
-  constants[`STUN_${messageType}`] = defaultConstants.messageType[messageType];
-});
+// Build the public constants object from the internal constant groups.
+const prefix = (obj, pre) =>
+  Object.fromEntries(Object.entries(obj).map(([k, v]) => [`${pre}${k}`, v]));
 
-Object.keys(defaultConstants.errorCode).forEach((errorCode) => {
-  constants[`STUN_CODE_${errorCode}`] = defaultConstants.errorCode[errorCode];
-});
-
-Object.keys(defaultConstants.errorReason).forEach((errorReason) => {
-  constants[`STUN_REASON_${errorReason}`] = defaultConstants.errorReason[errorReason];
-});
-
-Object.keys(defaultConstants.attributeType).forEach((attributeType) => {
-  constants[`STUN_ATTR_${attributeType}`] = defaultConstants.attributeType[attributeType];
-});
-
-Object.keys(defaultConstants.eventNames).forEach((eventName) => {
-  constants[`STUN_${eventName}`] = defaultConstants.eventNames[eventName];
-});
+Object.assign(
+  constants,
+  prefix(defaultConstants.messageType, 'STUN_'),
+  prefix(defaultConstants.errorCode, 'STUN_CODE_'),
+  prefix(defaultConstants.errorReason, 'STUN_REASON_'),
+  prefix(defaultConstants.attributeType, 'STUN_ATTR_'),
+  prefix(defaultConstants.eventNames, 'STUN_'),
+  prefix(defaultConstants.passwordAlgorithm, 'STUN_PASSWORD_ALGORITHM_'),
+);

@@ -6,6 +6,7 @@ const assert = require('node:assert/strict');
 const {
   validateFingerprint,
   validateMessageIntegrity,
+  validateMessageIntegritySha256,
 } = require('../../src/lib/validate');
 const constants = require('../../src/lib/constants');
 const decode = require('../../src/message/decode');
@@ -62,4 +63,44 @@ test('validate MESSAGE INTEGRITY + FINGERPRINT', () => {
 
   assert.equal(validateMessageIntegrity(message, password), true);
   assert.equal(validateFingerprint(message), true);
+});
+
+test('validate MESSAGE-INTEGRITY-SHA256', () => {
+  const password = 'sha256-secret';
+  const message = createMessage();
+
+  message.setType(BINDING_RESPONSE);
+  message.addAttribute(SOFTWARE, 'rfc8489-test');
+  message.addMessageIntegritySha256(password);
+
+  assert.equal(validateMessageIntegritySha256(message, password), true);
+  assert.equal(validateMessageIntegritySha256(message, 'wrong-key'), false);
+});
+
+test('validate MESSAGE-INTEGRITY-SHA256 + FINGERPRINT', () => {
+  const password = 'sha256-secret';
+  const message = createMessage();
+
+  message.setType(BINDING_RESPONSE);
+  message.addAttribute(SOFTWARE, 'rfc8489-test');
+  message.addMessageIntegritySha256(password);
+  message.addFingerprint();
+
+  assert.equal(validateMessageIntegritySha256(message, password), true);
+  assert.equal(validateFingerprint(message), true);
+});
+
+test('validateMessageIntegritySha256: returns false when attribute absent', () => {
+  const message = createMessage();
+  message.setType(BINDING_RESPONSE);
+  assert.equal(validateMessageIntegritySha256(message, 'key'), false);
+});
+
+test('addMessageIntegritySha256: cannot coexist with MESSAGE-INTEGRITY', () => {
+  const password = 'shared';
+  const message = createMessage();
+  message.setType(BINDING_RESPONSE);
+  message.addMessageIntegrity(password);
+  // Adding SHA-256 integrity when SHA-1 is already present must return false.
+  assert.equal(message.addMessageIntegritySha256(password), false);
 });

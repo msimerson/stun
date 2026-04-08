@@ -10,6 +10,8 @@ const StunErrorCodeAttribute = require('../attributes/stun-error-code-attribute'
 const StunUInt16ListAttribute = require('../attributes/stun-uint16list-attribute');
 const StunUnknownAttribute = require('../attributes/stun-unknown-attribute');
 const StunUInt16Attribute = require('../attributes/stun-uint16-attribute');
+const StunPasswordAlgorithmAttribute = require('../attributes/stun-password-algorithm-attribute');
+const StunPasswordAlgorithmsAttribute = require('../attributes/stun-password-algorithms-attribute');
 const { attributeType, attributeValueType } = require('./constants');
 
 module.exports = {
@@ -47,7 +49,16 @@ function getValueType(attributeType_) {
     case attributeType.RESERVATION_TOKEN:
     case attributeType.DONT_FRAGMENT:
     case attributeType.PADDING:
+    case attributeType.MESSAGE_INTEGRITY_SHA256:
+    case attributeType.USERHASH:
+    case attributeType.ALTERNATE_DOMAIN:
       return attributeValueType.BYTE_STRING;
+
+    case attributeType.PASSWORD_ALGORITHM:
+      return attributeValueType.PASSWORD_ALGORITHM;
+
+    case attributeType.PASSWORD_ALGORITHMS:
+      return attributeValueType.PASSWORD_ALGORITHMS;
 
     case attributeType.ERROR_CODE:
       return attributeValueType.ERROR_CODE;
@@ -108,6 +119,12 @@ function create(type, ...arguments_) {
     case attributeValueType.UINT16:
       return new StunUInt16Attribute(type, ...arguments_);
 
+    case attributeValueType.PASSWORD_ALGORITHM:
+      return new StunPasswordAlgorithmAttribute(type, ...arguments_);
+
+    case attributeValueType.PASSWORD_ALGORITHMS:
+      return new StunPasswordAlgorithmsAttribute(type, ...arguments_);
+
     default:
       break;
   }
@@ -145,6 +162,12 @@ function parse(attributePacket, owner) {
 
     case attributeValueType.UINT16:
       return StunUInt16Attribute.from(type, value, owner);
+
+    case attributeValueType.PASSWORD_ALGORITHM:
+      return StunPasswordAlgorithmAttribute.from(type, value, owner);
+
+    case attributeValueType.PASSWORD_ALGORITHMS:
+      return StunPasswordAlgorithmsAttribute.from(type, value, owner);
 
     default:
       break;

@@ -41,3 +41,15 @@ test('decode', () => {
     reason,
   });
 });
+
+test('decode formula: errorClass * 100 + code', () => {
+  // errorClass=4 (UNAUTHORIZED class), code=1 → must produce 401, not 4*(1+100)=404
+  const header = Buffer.from([0, 0, 4, 1]);
+  const attribute = StunErrorCodeAttribute.from(
+    type,
+    Buffer.concat([header, Buffer.alloc(0)]),
+  );
+
+  assert.equal(attribute.code, 401);
+  assert.equal(attribute.errorClass, 4);
+});

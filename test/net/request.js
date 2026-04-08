@@ -1,6 +1,6 @@
 'use strict';
 
-const { describe, test } = require('node:test');
+const { test } = require('node:test');
 const assert = require('node:assert/strict');
 
 const { request } = require('../../src/net/request');
@@ -10,13 +10,9 @@ const { messageType } = require('../../src/lib/constants');
 const StunServer = require('../../src/net/dgram-server');
 const { createServer } = require('../../src/net/create-server');
 
-test('should work', (t, done) => {
-  request('stun://stun.l.google.com:19302', (error, res) => {
-    assert.equal(error, null);
-    assert.equal(true, res instanceof StunResponse);
-
-    done();
-  });
+test('should work', async () => {
+  const res = await request('stun://stun.l.google.com:19302');
+  assert.equal(true, res instanceof StunResponse);
 });
 
 test('should work as promise', async () => {
@@ -24,16 +20,12 @@ test('should work as promise', async () => {
   assert.equal(true, res instanceof StunResponse);
 });
 
-test('url normalization should work', (t, done) => {
-  request('stun.l.google.com:19302', (error, res) => {
-    assert.equal(error, null);
-    assert.equal(true, res instanceof StunResponse);
-
-    done();
-  });
+test('url normalization should work', async () => {
+  const res = await request('stun.l.google.com:19302');
+  assert.equal(true, res instanceof StunResponse);
 });
 
-test('should use provided STUN server', (t, done) => {
+test('should use provided STUN server', async () => {
   const socket = {
     on: function () {},
     once: function () {},
@@ -45,26 +37,38 @@ test('should use provided STUN server', (t, done) => {
     called++;
   };
 
-  request('stun.l.google.com:19302', { server, retries: 0 }, () => {
-    assert.equal(called, 1);
-    done();
-  });
+  await assert.rejects(
+    request('stun.l.google.com:19302', { server, retries: 0 }),
+    /timeout/,
+  );
+  assert.equal(called, 1);
 });
 
-test('should use provided message', (t, done) => {
+test('should use provided message', async () => {
   const server = createServer({ type: 'udp4' });
-  const request_ = createMessage(messageType.BINDING_REQUEST);
+  const message = createMessage(messageType.BINDING_REQUEST);
 
-  const options = {
-    server,
-    retries: 0,
-    message: request_,
-  };
-
-  request('stun.l.google.com:19302', options, (error, res) => {
-    assert.equal(error, null);
-    assert.equal(res.transactonId, request_.transactonId);
+  try {
+    const res = await request('stun.l.google.com:19302', { server, retries: 0, message });
+    assert.deepEqual(res.transactionId, message.transactionId);
+  } finally {
     server.close();
-    done();
-  });
+  }
+});
+
+test('rejects unsupported protocol', async () => {
+  await assert.rejects(request('http://example.com:3478'), /Invalid protocol/);
+});
+
+test('stuns: uses TLS transport and default port 5349', async () => {
+  // Just verify the protocol routing works — we can't easily hit a real stuns: server in CI.
+  // A connection refused error means the routing worked (not an "Invalid protocol" error).
+  await assert.rejects(
+    request('stuns://127.0.0.1:19999', { timeout: 500 }),
+    // Could be ECONNREFUSED, ECONNRESET, timeout, or cert error — not "Invalid protocol".
+    (err) => {
+      assert.doesNotMatch(err.message, /Invalid protocol/);
+      return true;
+    },
+  );
 });

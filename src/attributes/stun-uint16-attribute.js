@@ -9,12 +9,12 @@ const StunAttribute = require('./stun-attribute');
 
 const MAX_UINT16 = 0xffff;
 
-const kValue = Symbol('kValue');
-
 /**
  * This class implements STUN attribute for uint16 numbers.
  */
 module.exports = class StunUInt16Attribute extends StunAttribute {
+  #value = 0;
+
   /**
    * @class StunUInt16Attribute
    * @param {number} type Attribute type.
@@ -23,15 +23,14 @@ module.exports = class StunUInt16Attribute extends StunAttribute {
   constructor(type, value) {
     super(type);
 
-    this[kValue] = 0;
     this.setValue(value);
   }
 
   /**
-   * Create `StunAddressAttribute` instance from the buffer.
+   * Create `StunUInt16Attribute` instance from the buffer.
    * @param {number} type
    * @param {Buffer} message
-   * @returns {StunAddressAttribute}
+   * @returns {StunUInt16Attribute}
    */
   static from(type, message) {
     return new StunUInt16Attribute(type, message.readUInt16BE(0));
@@ -41,7 +40,7 @@ module.exports = class StunUInt16Attribute extends StunAttribute {
    * Get attribute value.
    */
   get value() {
-    return this[kValue];
+    return this.#value;
   }
 
   /**
@@ -59,7 +58,7 @@ module.exports = class StunUInt16Attribute extends StunAttribute {
    */
   setValue(value) {
     if (Number.isSafeInteger(value) && value >= 0 && value <= MAX_UINT16) {
-      this[kValue] = value;
+      this.#value = value;
       return true;
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "@msimerson/stun",
-  "version": "3.1.2",
+  "version": "3.2.0",
   "description": "Session Traversal Utilities for NAT (STUN) client and server.",
   "main": "src/index.js",
   "scripts": {
@@ -14,7 +14,9 @@
     "format": "npm run prettier:fix && npm run lint:fix",
     "versions:fix": "npx npm-dep-mgr update"
   },
-  "bin": "./src/cli.js",
+  "bin": {
+    "stun": "src/cli.js"
+  },
   "files": [
     "src",
     "examples",
@@ -29,6 +31,8 @@
     "stun",
     "rfc5389",
     "5389",
+    "rfc8489",
+    "rfc7064",
     "ice",
     "turn"
   ],
@@ -54,7 +58,7 @@
     "turbo-crc32": "^1.0.1"
   },
   "engines": {
-    "node": ">=18.0"
+    "node": ">=20.0"
   },
   "prettier": {
     "printWidth": 90,
