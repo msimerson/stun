@@ -1,11 +1,17 @@
 'use strict';
 
 const Emitter = require('events');
-const isStun = (msg) => Buffer.isBuffer(msg) && msg.length > 0 && msg[0] <= 3;
 const StunRequest = require('../message/request');
 const decode = require('../message/decode');
 const constants = require('../lib/constants');
 const { StunMessageError, StunResponseError } = require('../lib/errors');
+
+const STUN_MIN_LENGTH = 20;
+const isStun = (msg) =>
+  Buffer.isBuffer(msg) &&
+  msg.length >= STUN_MIN_LENGTH &&
+  msg[0] <= 3 &&
+  msg.readUInt32BE(4) === constants.kStunMagicCookie;
 
 const {
   eventNames: {

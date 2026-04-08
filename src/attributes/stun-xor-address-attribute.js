@@ -3,8 +3,8 @@
 const net = require('net');
 const ipa = require('ipaddr.js');
 function xor(a, b) {
-  const buf = Buffer.allocUnsafe(Math.max(a.length, b.length));
-  for (let i = 0; i < buf.length; i++) buf[i] = a[i] ^ b[i];
+  const buf = Buffer.alloc(Math.max(a.length, b.length), 0);
+  for (let i = 0; i < buf.length; i++) buf[i] = (a[i] ?? 0) ^ (b[i] ?? 0);
   return buf;
 }
 const { pton4, pton6 } = require('ip2buf');

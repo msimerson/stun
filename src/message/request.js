@@ -32,9 +32,7 @@ const kAttributes = Symbol.for('kAttributes');
 const EMPTY_MESSAGE_INTEGRITY = Buffer.alloc(kStunMessageIntegritySize, 0);
 
 const toUInt32 = (x) => x >>> 0;
-const MAX_INT32 = 0x7fffffff;
-const MIN_INT32 = -2147483648;
-const isINT32 = (v) => v <= MAX_INT32 && v >= MIN_INT32;
+const isUInt32 = (v) => v >= 0 && v <= 0xffffffff;
 
 /**
  * This class implements outgoing STUN messages.
@@ -157,9 +155,9 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addUsername(username) {
-    if (username.length > 513) {
+    if (username.length >= 513) {
       throw new Error(
-        'Username should be less than 513 bytes, see' +
+        'Username must be less than 513 bytes, see' +
           ' https://tools.ietf.org/html/rfc5389#section-15.3',
       );
     }
@@ -294,8 +292,8 @@ class StunRequest extends StunMessage {
    * @returns {boolean}
    */
   addPriority(priority) {
-    if (!Number.isInteger(priority) || !isINT32(priority)) {
-      throw new TypeError('The argument should be 32-bit integer.');
+    if (!Number.isInteger(priority) || !isUInt32(priority)) {
+      throw new TypeError('The argument should be a 32-bit unsigned integer.');
     }
 
     return this.addAttribute(attributeType.PRIORITY, priority);
