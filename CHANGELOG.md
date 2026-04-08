@@ -4,6 +4,11 @@ All notable changes to the "stun" package will be documented in this file.
 
 ### NEXT
 
+- dep(debug): → process.env.DEBUG-conditional logger
+- dep(minimist): → manual argv loop
+- dep(buffer-xor): → 3-line inline XOR loop
+- dep(is-stun): → 1-line inline arrow function
+- dep(universalify: → util.promisify
 - dep(eslint): upgrade to v10
 - dep(jest): use node:test for test runner
 - ci: updates

@@ -1,7 +1,7 @@
 'use strict';
 
 const Emitter = require('events');
-const isStun = require('is-stun');
+const isStun = (msg) => Buffer.isBuffer(msg) && msg.length > 0 && msg[0] <= 3;
 const StunRequest = require('../message/request');
 const decode = require('../message/decode');
 const constants = require('../lib/constants');
