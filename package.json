@@ -26,6 +26,9 @@
     "turn"
   ],
   "author": "Dmitry Tsvettsikh <me@reklatsmasters.com>",
+  "contributors": [
+    "Matt Simerson <matt@tnpi.net>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/msimerson/stun/issues"
