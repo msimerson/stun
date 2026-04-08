@@ -6,7 +6,8 @@ const constants = require('./constants');
 const encode = require('../message/encode');
 
 const { FINGERPRINT, MESSAGE_INTEGRITY } = constants.attributeType;
-const { kStunFingerprintXorValue, kStunFingerprintLength, kStunMessageIntegrityLength } = constants;
+const { kStunFingerprintXorValue, kStunFingerprintLength, kStunMessageIntegrityLength } =
+  constants;
 
 module.exports = {
   validateFingerprint,

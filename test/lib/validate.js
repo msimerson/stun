@@ -3,7 +3,10 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 
-const { validateFingerprint, validateMessageIntegrity } = require('../../src/lib/validate');
+const {
+  validateFingerprint,
+  validateMessageIntegrity,
+} = require('../../src/lib/validate');
 const constants = require('../../src/lib/constants');
 const decode = require('../../src/message/decode');
 const { createMessage } = require('../../src/lib/create-message');
@@ -16,7 +19,7 @@ test('validate fingerprint', () => {
     '0101002c2112a442644d4f37326c71514d4f4a51' +
       '002000080001cc03e1baa56100080014a8fbde3bdc5ff7ab1e8' +
       '52a8c2cc6ef651cb74889802800042748c3bb',
-    'hex'
+    'hex',
   );
 
   const message = decode(packet);
@@ -39,7 +42,7 @@ test('validate MESSAGE INTEGRITY', () => {
     '010100242112a4426f576f544a34445674305276' +
       '002000080001db91e1baa56600080014e161f72ee' +
       '71ed9f6accaef828ec42f19a809045a',
-    'hex'
+    'hex',
   );
 
   const message = decode(packet);

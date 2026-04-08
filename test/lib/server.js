@@ -75,7 +75,10 @@ test('should listen', () => {
   const callback = mockFn();
   server.listen(123, 'localhost', callback);
   assert.deepEqual(sock.bind.calls[sock.bind.calls.length - 1], [123, 'localhost']);
-  assert.deepEqual(server.once.calls[server.once.calls.length - 1], ['listening', callback]);
+  assert.deepEqual(server.once.calls[server.once.calls.length - 1], [
+    'listening',
+    callback,
+  ]);
 });
 
 test('should call callbacks for `listening`', () => {

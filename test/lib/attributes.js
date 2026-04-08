@@ -3,7 +3,11 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 
-const { attributeType, messageType, attributeValueType } = require('../../src/lib/constants');
+const {
+  attributeType,
+  messageType,
+  attributeValueType,
+} = require('../../src/lib/constants');
 const { createMessage } = require('../../src/lib/create-message');
 
 function createTestMessage() {
@@ -33,7 +37,11 @@ test('support LIFETIME attribute', () => {
 
 test('support XOR_PEER_ADDRESS attribute', () => {
   const message = createTestMessage();
-  const attribute = message.addAttribute(attributeType.XOR_PEER_ADDRESS, '127.0.0.1', 1234);
+  const attribute = message.addAttribute(
+    attributeType.XOR_PEER_ADDRESS,
+    '127.0.0.1',
+    1234,
+  );
 
   assert.equal(attribute.valueType, attributeValueType.XOR_ADDRESS);
 });
@@ -47,7 +55,11 @@ test('support DATA attribute', () => {
 
 test('support XOR_RELAYED_ADDRESS attribute', () => {
   const message = createTestMessage();
-  const attribute = message.addAttribute(attributeType.XOR_RELAYED_ADDRESS, '127.0.0.1', 1234);
+  const attribute = message.addAttribute(
+    attributeType.XOR_RELAYED_ADDRESS,
+    '127.0.0.1',
+    1234,
+  );
 
   assert.equal(attribute.valueType, attributeValueType.XOR_ADDRESS);
 });
@@ -105,7 +117,11 @@ test('support RESPONSE_PORT attribute', () => {
 
 test('support RESPONSE_ORIGIN attribute', () => {
   const message = createTestMessage();
-  const attribute = message.addAttribute(attributeType.RESPONSE_ORIGIN, '127.0.0.1', 1234);
+  const attribute = message.addAttribute(
+    attributeType.RESPONSE_ORIGIN,
+    '127.0.0.1',
+    1234,
+  );
 
   assert.equal(attribute.valueType, attributeValueType.ADDRESS);
 });

@@ -27,7 +27,7 @@ function decode(message) {
   response[kCookie] = packet.header.cookie;
 
   response[kAttributes] = packet.attributes.map((attribute) =>
-    attributes.parse(attribute, response)
+    attributes.parse(attribute, response),
   );
 
   return response;

@@ -14,9 +14,15 @@ test('createMessageType', () => {
 
   // First 4 bits.
   assert.equal(createMessageType(methods.BINDING, classType.REQUEST), BINDING_REQUEST);
-  assert.equal(createMessageType(methods.BINDING, classType.INDICATION), BINDING_INDICATION);
+  assert.equal(
+    createMessageType(methods.BINDING, classType.INDICATION),
+    BINDING_INDICATION,
+  );
   assert.equal(createMessageType(methods.BINDING, classType.RESPONSE), BINDING_RESPONSE);
-  assert.equal(createMessageType(methods.BINDING, classType.ERROR), BINDING_ERROR_RESPONSE);
+  assert.equal(
+    createMessageType(methods.BINDING, classType.ERROR),
+    BINDING_ERROR_RESPONSE,
+  );
 
   // Bits 4 - 6.
   assert.equal(createMessageType(0b11111, classType.ERROR), 0b100111111);

@@ -232,7 +232,7 @@ Returns the `StunAttribute` attribute of the specified `type`. The `type` argume
 
 ```js
 const attributes = Array.from(stunMessage).filter(
-  (attribute) => attribute.type === STUN_ATTR_MAPPED_ADDRESS
+  (attribute) => attribute.type === STUN_ATTR_MAPPED_ADDRESS,
 );
 ```
 
@@ -339,7 +339,11 @@ stunMsg.addAttribute(STUN_ATTR_UNKNOWN_ATTRIBUTES, [2, 3, 4]);
 Adds a `type` attribute to the current message. The `type` argument should be `STUN_ATTR_ERROR_CODE`.
 
 ```js
-stunMsg.addAttribute(STUN_ATTR_ERROR_CODE, STUN_CODE_UNAUTHORIZED, STUN_REASON_UNAUTHORIZED);
+stunMsg.addAttribute(
+  STUN_ATTR_ERROR_CODE,
+  STUN_CODE_UNAUTHORIZED,
+  STUN_REASON_UNAUTHORIZED,
+);
 ```
 
 <a name="class-stun-message-add-address" />
@@ -710,5 +714,5 @@ See above.
 
 MIT
 
-- 2017–2019 © Dmitry Tsvettsikh (original author, [reklatsmasters/stun](https://github.com/reklatsmasters/stun))
+- 2017–2019 © Dmitry Tsvettsikh (original author, [reklatsmasters/stun](https://github.com/nodertc/stun))
 - 2024–2026 © Matt Simerson (fork maintainer, [msimerson/stun](https://github.com/msimerson/stun))

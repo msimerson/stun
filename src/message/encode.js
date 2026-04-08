@@ -29,7 +29,10 @@ function encode(message) {
   const packet = {
     header: {
       type: message.type,
-      length: binary.encodingLength(attributes, array(StunAttributePacket, attributes.length)),
+      length: binary.encodingLength(
+        attributes,
+        array(StunAttributePacket, attributes.length),
+      ),
       cookie: message[kCookie],
       transaction: message.transactionId,
     },

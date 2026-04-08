@@ -160,7 +160,7 @@ class StunRequest extends StunMessage {
     if (username.length > 513) {
       throw new Error(
         'Username should be less than 513 bytes, see' +
-          ' https://tools.ietf.org/html/rfc5389#section-15.3'
+          ' https://tools.ietf.org/html/rfc5389#section-15.3',
       );
     }
     return this.addAttribute(attributeType.USERNAME, username);
@@ -181,13 +181,13 @@ class StunRequest extends StunMessage {
     // value MUST be between 0 and 99.
     if (code < 300 || code > 699) {
       throw new Error(
-        'Error code should between 300 - 699, see https://tools.ietf.org/html/rfc5389#section-15.6'
+        'Error code should between 300 - 699, see https://tools.ietf.org/html/rfc5389#section-15.6',
       );
     }
 
     if (reason && reason.length > 128) {
       throw new Error(
-        'The reason phrase MUST be a UTF-8 encoded sequence of less than 128 characters'
+        'The reason phrase MUST be a UTF-8 encoded sequence of less than 128 characters',
       );
     }
 
@@ -255,7 +255,7 @@ class StunRequest extends StunMessage {
 
     const attributeIntegrity = this.addAttribute(
       attributeType.MESSAGE_INTEGRITY,
-      EMPTY_MESSAGE_INTEGRITY
+      EMPTY_MESSAGE_INTEGRITY,
     );
     const message = this.toBuffer();
 
@@ -283,7 +283,9 @@ class StunRequest extends StunMessage {
     }
 
     const crc32buf = message.slice(0, -kStunFingerprintLength);
-    return attributeFingerprint.setValue(toUInt32(crc32(crc32buf) ^ kStunFingerprintXorValue));
+    return attributeFingerprint.setValue(
+      toUInt32(crc32(crc32buf) ^ kStunFingerprintXorValue),
+    );
   }
 
   /**
@@ -355,7 +357,10 @@ class StunRequest extends StunMessage {
     const packet = {
       header: {
         type: this.type,
-        length: encodingLength(attributes_, array(StunAttributePacket, attributes_.length)),
+        length: encodingLength(
+          attributes_,
+          array(StunAttributePacket, attributes_.length),
+        ),
         cookie: this[kCookie],
         transaction: this.transactionId,
       },
@@ -400,7 +405,9 @@ function isValidTransactionId(transactionId) {
  */
 function assert128string(string) {
   if (typeof string !== 'string' || string.length > 128) {
-    throw new Error('The argument MUST be a UTF-8 encoded sequence of less than 128 characters');
+    throw new Error(
+      'The argument MUST be a UTF-8 encoded sequence of less than 128 characters',
+    );
   }
 }
 
