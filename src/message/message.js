@@ -17,13 +17,27 @@ module.exports = class StunMessage {
 
   // Protected accessors for StunRequest (subclass) and package internals
   // (decode.js, encode.js). Not part of the public API.
-  get _type() { return this.#type; }
-  set _type(v) { this.#type = v; }
-  get _transactionId() { return this.#transactionId; }
-  set _transactionId(v) { this.#transactionId = v; }
-  get _cookie() { return this.#cookie; }
-  get _attributes() { return this.#attributes; }
-  set _attributes(v) { this.#attributes = v; }
+  get _type() {
+    return this.#type;
+  }
+  set _type(v) {
+    this.#type = v;
+  }
+  get _transactionId() {
+    return this.#transactionId;
+  }
+  set _transactionId(v) {
+    this.#transactionId = v;
+  }
+  get _cookie() {
+    return this.#cookie;
+  }
+  get _attributes() {
+    return this.#attributes;
+  }
+  set _attributes(v) {
+    this.#attributes = v;
+  }
 
   /**
    * Populate fields from a decoded packet header and parsed attribute list.

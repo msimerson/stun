@@ -107,7 +107,10 @@ function xorIP(address, owner) {
   if (net.isIPv4(address)) {
     xored = xor(pton4(address), constants.kStunMagicCookieBuffer);
   } else if (net.isIPv6(address)) {
-    xored = xor(pton6(address), Buffer.concat([constants.kStunMagicCookieBuffer, owner.transactionId]));
+    xored = xor(
+      pton6(address),
+      Buffer.concat([constants.kStunMagicCookieBuffer, owner.transactionId]),
+    );
   } else {
     throw new Error(`Invalid ip address: ${address}`);
   }

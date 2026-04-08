@@ -5,7 +5,11 @@ const assert = require('node:assert/strict');
 
 const StunPasswordAlgorithmAttribute = require('../../src/attributes/stun-password-algorithm-attribute');
 const StunPasswordAlgorithmsAttribute = require('../../src/attributes/stun-password-algorithms-attribute');
-const { attributeType, attributeValueType, passwordAlgorithm } = require('../../src/lib/constants');
+const {
+  attributeType,
+  attributeValueType,
+  passwordAlgorithm,
+} = require('../../src/lib/constants');
 
 // --- StunPasswordAlgorithmAttribute (PASSWORD_ALGORITHM, 0x001D) ---
 
@@ -55,7 +59,11 @@ test('PASSWORD_ALGORITHM: decode round-trip (MD5)', () => {
   );
   const buf = attr.toBuffer();
 
-  const decoded = StunPasswordAlgorithmAttribute.from(attributeType.PASSWORD_ALGORITHM, buf, null);
+  const decoded = StunPasswordAlgorithmAttribute.from(
+    attributeType.PASSWORD_ALGORITHM,
+    buf,
+    null,
+  );
   assert.equal(decoded.value.algorithm, passwordAlgorithm.MD5);
   assert.equal(decoded.value.params.length, 0);
 });
@@ -69,7 +77,11 @@ test('PASSWORD_ALGORITHM: decode round-trip (SHA-256 with params)', () => {
   );
   const buf = attr.toBuffer();
 
-  const decoded = StunPasswordAlgorithmAttribute.from(attributeType.PASSWORD_ALGORITHM, buf, null);
+  const decoded = StunPasswordAlgorithmAttribute.from(
+    attributeType.PASSWORD_ALGORITHM,
+    buf,
+    null,
+  );
   assert.equal(decoded.value.algorithm, passwordAlgorithm.SHA_256);
   assert.deepEqual(decoded.value.params, params);
 });
@@ -136,7 +148,10 @@ test('PASSWORD_ALGORITHMS: decode round-trip', () => {
     { algorithm: passwordAlgorithm.MD5, params: Buffer.alloc(0) },
     { algorithm: passwordAlgorithm.SHA_256, params: Buffer.alloc(0) },
   ];
-  const attr = new StunPasswordAlgorithmsAttribute(attributeType.PASSWORD_ALGORITHMS, algorithms);
+  const attr = new StunPasswordAlgorithmsAttribute(
+    attributeType.PASSWORD_ALGORITHMS,
+    algorithms,
+  );
   const buf = attr.toBuffer();
 
   const decoded = StunPasswordAlgorithmsAttribute.from(
@@ -152,7 +167,10 @@ test('PASSWORD_ALGORITHMS: decode round-trip', () => {
 test('PASSWORD_ALGORITHMS: decode with params round-trip', () => {
   const params = Buffer.from([0xca, 0xfe, 0xba]);
   const algorithms = [{ algorithm: passwordAlgorithm.SHA_256, params }];
-  const attr = new StunPasswordAlgorithmsAttribute(attributeType.PASSWORD_ALGORITHMS, algorithms);
+  const attr = new StunPasswordAlgorithmsAttribute(
+    attributeType.PASSWORD_ALGORITHMS,
+    algorithms,
+  );
   const decoded = StunPasswordAlgorithmsAttribute.from(
     attributeType.PASSWORD_ALGORITHMS,
     attr.toBuffer(),

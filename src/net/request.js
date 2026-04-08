@@ -69,7 +69,13 @@ async function request(url, options = {}) {
   const retryOptions = { ...defaultRetryOptions, ...options };
 
   try {
-    return await sendWithRetry(server, message, Number(port) || 3478, hostname, retryOptions);
+    return await sendWithRetry(
+      server,
+      message,
+      Number(port) || 3478,
+      hostname,
+      retryOptions,
+    );
   } finally {
     if (!externalServer) {
       debug('close server');
@@ -158,7 +164,7 @@ function retry(fn, options, callback) {
       return;
     }
 
-    const rto = options.timeout * (2 ** (count - 1));
+    const rto = options.timeout * 2 ** (count - 1);
     const timeout = Math.min(rto, options.maxTimeout);
     debug('start timer %s (rto = %s)', timeout, rto);
 

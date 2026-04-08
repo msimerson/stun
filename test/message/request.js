@@ -460,7 +460,10 @@ test('addMessageIntegritySha256', () => {
   assert.equal(message.addMessageIntegritySha256(key), true);
   assert.equal(message.hasAttribute(attributeType.MESSAGE_INTEGRITY_SHA256), true);
   // SHA-256 HMAC is 32 bytes.
-  assert.equal(message.getAttribute(attributeType.MESSAGE_INTEGRITY_SHA256).value.length, 32);
+  assert.equal(
+    message.getAttribute(attributeType.MESSAGE_INTEGRITY_SHA256).value.length,
+    32,
+  );
 });
 
 test('addMessageIntegritySha256: returns false with no key', () => {
@@ -512,7 +515,10 @@ test('addPasswordAlgorithms', () => {
   const message = new StunRequest();
   message.setType(constants.messageType.BINDING_REQUEST);
 
-  const algorithms = [{ algorithm: passwordAlgorithm.MD5 }, { algorithm: passwordAlgorithm.SHA_256 }];
+  const algorithms = [
+    { algorithm: passwordAlgorithm.MD5 },
+    { algorithm: passwordAlgorithm.SHA_256 },
+  ];
   const attr = message.addPasswordAlgorithms(algorithms);
   assert.ok(attr);
   assert.equal(attr.type, attributeType.PASSWORD_ALGORITHMS);

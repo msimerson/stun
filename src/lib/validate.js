@@ -5,7 +5,8 @@ const crc32 = require('turbo-crc32/crc32');
 const constants = require('./constants');
 const encode = require('../message/encode');
 
-const { FINGERPRINT, MESSAGE_INTEGRITY, MESSAGE_INTEGRITY_SHA256 } = constants.attributeType;
+const { FINGERPRINT, MESSAGE_INTEGRITY, MESSAGE_INTEGRITY_SHA256 } =
+  constants.attributeType;
 const {
   kStunFingerprintXorValue,
   kStunFingerprintLength,

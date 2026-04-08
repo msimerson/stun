@@ -50,7 +50,10 @@ test('getFingerprint returns the fingerprint value', () => {
   const { encode } = require('../../src/message/encode') || {};
   // Use the StunRequest directly — getFingerprint should return the uint32 value
   const fp = msg.getAttribute(attributeType.FINGERPRINT);
-  assert.ok(typeof fp.value === 'number', 'fingerprint attribute value should be a number');
+  assert.ok(
+    typeof fp.value === 'number',
+    'fingerprint attribute value should be a number',
+  );
   assert.ok(fp.value >>> 0 === fp.value, 'fingerprint should be uint32');
 });
 

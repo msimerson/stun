@@ -49,7 +49,6 @@ function getValueType(attributeType_) {
     case attributeType.RESERVATION_TOKEN:
     case attributeType.DONT_FRAGMENT:
     case attributeType.PADDING:
-    // RFC 8489 byte-string attributes.
     case attributeType.MESSAGE_INTEGRITY_SHA256:
     case attributeType.USERHASH:
     case attributeType.ALTERNATE_DOMAIN:
