@@ -16,7 +16,7 @@
   },
   "bin": "./src/cli.js",
   "files": [
-    "src", "examples"
+    "src", "examples", "CHANGELOG.md"
   ],
   "repository": {
     "type": "git",
