@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ${{ fromJson(needs.get-lts.outputs.active) }}
+        node-version: ${{ fromJson(needs.get-lts.outputs.lts) }}
       fail-fast: false
     steps:
       - uses: actions/checkout@v6
@@ -53,19 +53,20 @@ jobs:
       - run: npm install
       - run: npm run test
 
-  windows:
+  active:
     needs: [lint, get-lts]
     permissions:
       contents: read
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [windows-latest, macos-latest]
         node-version: ${{ fromJson(needs.get-lts.outputs.active) }}
       fail-fast: false
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
-        name: Node.js ${{ matrix.node-version }} on windows-latest
+        name: Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install

@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/msimerson/stun/actions/workflows/ci.yml/badge.svg)](https://github.com/msimerson/stun/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/msimerson/stun/badge.svg?branch=master)](https://coveralls.io/github/msimerson/stun)
 
-Session Traversal Utilities for NAT (STUN) server. Implements [8489](https://tools.ietf.org/html/rfc8489), [RFC7064](https://tools.ietf.org/html/rfc7064), [RFC5389](https://tools.ietf.org/html/rfc5389) with partial support for [RFC5766](https://tools.ietf.org/html/rfc5766), [RFC5245](https://tools.ietf.org/html/rfc5245), [RFC5780](https://tools.ietf.org/html/rfc5780).
+Session Traversal Utilities for NAT (STUN) server. Implements RFCs [8489](https://tools.ietf.org/html/rfc8489), [7064](https://tools.ietf.org/html/rfc7064), [5389](https://tools.ietf.org/html/rfc5389) and with partial support for [5766](https://tools.ietf.org/html/rfc5766), [5245](https://tools.ietf.org/html/rfc5245), and [5780](https://tools.ietf.org/html/rfc5780).
 
 ## Install
 
@@ -15,17 +15,6 @@ npm i stun
 
 ```js
 const stun = require('stun');
-
-stun.request('stun.l.google.com:19302', (err, res) => {
-  if (err) {
-    console.error(err);
-  } else {
-    const { address } = res.getXorAddress();
-    console.log('your ip', address);
-  }
-});
-
-// or with promise
 
 const res = await stun.request('stun.l.google.com:19302');
 console.log('your ip', res.getXorAddress().address);
@@ -45,7 +34,7 @@ $ stun # started on udp/0.0.0.0:3478
 - [`createServer(options: Object): StunServer`](#create-server)
 - [`validateFingerprint(message: StunMessage): bool`](#validate-fingerprint)
 - [`validateMessageIntegrity(message: StunMessage, key: string): bool`](#validate-message-integrity)
-- [`request(url: string, [options: RequestOptions], callback: function): void`](#request)
+- [`request(url: string, [options: RequestOptions]): Promise<StunResponse>`](#request)
 - [`encode(message: StunMessage): Buffer`](#encode)
 - [`decode(message: Buffer): StunResponse`](#decode)
 - [`class StunRequest`](#class-stun-request)
@@ -165,11 +154,9 @@ stunServer.on('bindingResponse', (msg) => {
 
 <a name="request" />
 
-#### `request(url: string, [options: RequestOptions], callback: function): void`
+#### `request(url: string, [options: RequestOptions]): Promise<StunResponse>`
 
-#### `request(url: string, [options: RequestOptions]): Promise`
-
-Create a request `STUN_BINDING_REQUEST` to stun server, follow [RFC5389](https://tools.ietf.org/html/rfc5389). The first argument may be a host (`stun.example.com`), host with port (`stun.example.com:1234`) or host with port and protocol (`stun://stun.example.com:1234`). By default, port is 3478.
+Create a request `STUN_BINDING_REQUEST` to stun server, follow [RFC5389](https://tools.ietf.org/html/rfc5389). The first argument may be a host (`stun.example.com`), host with port (`stun.example.com:1234`) or host with port and protocol (`stun://stun.example.com:1234`). By default, port is 3478. For `stuns://` URLs, the default port is 5349 and the request is sent over TLS-over-TCP per [RFC 7064](https://tools.ietf.org/html/rfc7064).
 
 All options described below are optional.
 
@@ -180,7 +167,7 @@ All options described below are optional.
 - `options.maxTimeout: number`- Maximal RTO, default is infinity.
 - `options.retries: number` - Maximal the number of retries, default is 6
 
-The last argument is a function with 2 arguments `err` and `res`. It's follow nodejs callback style. The second argument is instance of `StunMessage`.
+Resolves with a `StunResponse`. Rejects with an `Error` (`'timeout'` after the final retry, or a STUN/socket error).
 
 <a name="encode" />
 
