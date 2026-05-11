@@ -1,6 +1,6 @@
 {
   "name": "@msimerson/stun",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Session Traversal Utilities for NAT (STUN) client and server.",
   "main": "src/index.js",
   "scripts": {
@@ -48,13 +48,13 @@
   "homepage": "https://github.com/msimerson/stun#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.2.0",
-    "globals": "^17.4.0"
+    "eslint": "^10.3.0",
+    "globals": "^17.6.0"
   },
   "dependencies": {
     "binary-data": "^0.6.0",
     "ip2buf": "^2.0.0",
-    "ipaddr.js": "^2.3.0",
+    "ipaddr.js": "^2.4.0",
     "turbo-crc32": "^1.0.1"
   },
   "engines": {

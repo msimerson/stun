@@ -4,6 +4,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ### Unreleased
 
+### [3.2.1] - 2026-05-11
+
+- deps: bump versions
+- docs(README): remove callback usage example, match the code
+- fix: update example/get-my-ip.js to use await syntax
+- ci: expand testing to LTS versions & macOS
+
 ### [3.2.0] - 2026-04-07
 
 RFC 8489 (STUN 2020) support:
@@ -144,3 +151,4 @@ JS Modernization
 [3.0.2]: https://github.com/msimerson/stun/releases/tag/v3.0.2
 [3.1.2]: https://github.com/msimerson/stun/releases/tag/v3.1.2
 [3.2.0]: https://github.com/msimerson/stun/releases/tag/v3.2.0
+[3.2.1]: https://github.com/msimerson/stun/releases/tag/v3.2.1
